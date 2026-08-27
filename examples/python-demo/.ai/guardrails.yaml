@@ -1,0 +1,39 @@
+{
+  "$schema": "./policy.schema.json",
+  "version": 1,
+  "name": "baseline",
+  "operations": {
+    "change": {
+      "required": [],
+      "advisory": [
+        "repository-validation",
+        "documentation",
+        "repository-ground-truth",
+        "change-scope",
+        "build",
+        "unit-tests",
+        "artifact-provenance",
+        "codeql-sast",
+        "secrets-scan",
+        "dependency-review",
+        "dependabot"
+      ]
+    },
+    "release": {
+      "required": [],
+      "advisory": [
+        "repository-validation",
+        "documentation",
+        "repository-ground-truth",
+        "change-scope",
+        "build",
+        "unit-tests",
+        "artifact-provenance",
+        "codeql-sast",
+        "secrets-scan",
+        "dependency-review",
+        "dependabot"
+      ]
+    }
+  }
+}

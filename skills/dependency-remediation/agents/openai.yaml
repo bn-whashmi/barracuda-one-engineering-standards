@@ -1,0 +1,4 @@
+interface:
+  display_name: "Dependency Remediation"
+  short_description: "Fix dependency alerts and package drift"
+  default_prompt: "Use $dependency-remediation to resolve dependency vulnerabilities, package drift, audit alerts, and lockfile issues while preserving package metadata."

@@ -1,0 +1,4 @@
+interface:
+  display_name: "Full Product Review"
+  short_description: "Full product audits and standardized review packs"
+  default_prompt: "Use $full-product-review to perform a full product review for this repository, generate a standardized review pack under docs/reviews/, and summarize the key findings."

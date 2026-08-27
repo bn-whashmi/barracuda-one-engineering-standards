@@ -1,0 +1,45 @@
+name: Artifact Provenance
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  id-token: write
+  attestations: write
+  artifact-metadata: write
+
+jobs:
+  attest:
+    name: Artifact Provenance
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          # Attestations record github.sha. On pull_request this is the
+          # synthetic merge revision, so the checked-out source must match it.
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - name: Build source bundle
+        env:
+          REVISION: ${{ github.sha }}
+        run: |
+          set -euo pipefail
+          mkdir -p dist
+          git archive \
+            --format=tar.gz \
+            --output "dist/engineering-standards-${REVISION}.tar.gz" \
+            "$REVISION"
+      - name: Generate artifact attestation
+        uses: actions/attest@1e69f48acb82d1966a394da916b4c1698aa569d6 # v4.2.2
+        with:
+          subject-path: dist/engineering-standards-${{ github.sha }}.tar.gz
+      - name: Upload source bundle
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: engineering-standards-${{ github.run_id }}
+          path: dist/*.tar.gz

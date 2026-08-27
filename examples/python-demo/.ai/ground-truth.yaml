@@ -1,0 +1,12 @@
+{
+  "version": 1,
+  "documents": [
+    {"path": "AGENTS.md"},
+    {"path": "ARCHITECTURE.md"},
+    {"path": "STANDARDS.md"},
+    {"path": "TESTING.md"},
+    {"path": "SECURITY.md"},
+    {"path": "DEPLOYMENT.md"},
+    {"path": "CONTRIBUTING.md"}
+  ]
+}

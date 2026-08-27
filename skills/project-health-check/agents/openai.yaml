@@ -1,0 +1,4 @@
+interface:
+  display_name: "Project Health Check"
+  short_description: "Repository health and maintenance audits"
+  default_prompt: "Use $project-health-check to assess this repository for maintenance risks, stale docs, config drift, and evidence-backed project health findings."

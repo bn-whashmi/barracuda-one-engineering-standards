@@ -1,0 +1,4 @@
+interface:
+  display_name: "Observability Gap Review"
+  short_description: "Find missing logs, metrics, and traces"
+  default_prompt: "Use $observability-gap-review to inspect this system for missing request tracing, weak diagnostics, and concrete observability gaps."

@@ -1,0 +1,4 @@
+interface:
+  display_name: "Config Drift Auditor"
+  short_description: "Audit config drift across environments"
+  default_prompt: "Use $config-drift-auditor to compare this repositories code, env files, and deployment assumptions for dangerous configuration drift."

@@ -1,0 +1,87 @@
+schema_version: "1.0"
+
+preset:
+  id: "engineering-standards"
+  name: "Engineering Standards"
+  version: "1.0.0"
+  description: "Spec Kit preset for issue-first, release-aware engineering standards"
+  author: "Engineering Standards contributors"
+  repository: "https://github.com/engineering-standards/spec-kit-preset-engineering-standards"
+  license: "MIT"
+
+requires:
+  speckit_version: ">=0.8.13"
+
+provides:
+  templates:
+    - type: "template"
+      name: "constitution-template"
+      file: "templates/constitution-addendum.md"
+      description: "Adds release, security, and governance principles to the constitution template"
+      strategy: "append"
+
+    - type: "template"
+      name: "spec-template"
+      file: "templates/spec-addendum.md"
+      description: "Adds issue, privacy, parity, and release evidence guidance to feature specs"
+      strategy: "append"
+
+    - type: "template"
+      name: "plan-template"
+      file: "templates/plan-addendum.md"
+      description: "Adds engineering standards gates to implementation plans"
+      strategy: "append"
+
+    - type: "template"
+      name: "tasks-template"
+      file: "templates/tasks-addendum.md"
+      description: "Adds standards-aligned task requirements"
+      strategy: "append"
+
+    - type: "template"
+      name: "checklist-template"
+      file: "templates/checklist-addendum.md"
+      description: "Adds standards checks to generated checklists"
+      strategy: "append"
+
+    - type: "command"
+      name: "speckit.constitution"
+      file: "commands/speckit.constitution.md"
+      description: "Wrap constitution updates with engineering standards principles"
+      strategy: "wrap"
+      replaces: "speckit.constitution"
+
+    - type: "command"
+      name: "speckit.specify"
+      file: "commands/speckit.specify.md"
+      description: "Wrap specification generation with issue-first and safety guidance"
+      strategy: "wrap"
+      replaces: "speckit.specify"
+
+    - type: "command"
+      name: "speckit.plan"
+      file: "commands/speckit.plan.md"
+      description: "Wrap implementation planning with validation and release evidence gates"
+      strategy: "wrap"
+      replaces: "speckit.plan"
+
+    - type: "command"
+      name: "speckit.tasks"
+      file: "commands/speckit.tasks.md"
+      description: "Wrap task generation with independently verifiable standards tasks"
+      strategy: "wrap"
+      replaces: "speckit.tasks"
+
+    - type: "command"
+      name: "speckit.implement"
+      file: "commands/speckit.implement.md"
+      description: "Wrap implementation with verification, evidence, and drift controls"
+      strategy: "wrap"
+      replaces: "speckit.implement"
+
+tags:
+  - "engineering"
+  - "standards"
+  - "release"
+  - "codex"
+  - "spec-driven"

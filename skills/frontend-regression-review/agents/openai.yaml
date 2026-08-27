@@ -1,0 +1,4 @@
+interface:
+  display_name: "Frontend Regression Review"
+  short_description: "Review frontend changes for real regressions"
+  default_prompt: "Use $frontend-regression-review to inspect this UI for concrete layout, accessibility, state, and interaction regressions."

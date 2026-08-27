@@ -1,0 +1,4 @@
+interface:
+  display_name: "API Contract Auditor"
+  short_description: "Audit API and SDK contract drift"
+  default_prompt: "Use $api-contract-auditor to inspect this backend, client, SDK, fixture, and adapter surface for verified contract drift, schema mismatches, hash drift, and decoding issues."

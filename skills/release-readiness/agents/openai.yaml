@@ -1,0 +1,4 @@
+interface:
+  display_name: "Release Readiness"
+  short_description: "Check whether a repository is ready to ship"
+  default_prompt: "Use $release-readiness to review this repository for release blockers, rollout risk, missing verification, and launch readiness issues."

@@ -1,0 +1,4 @@
+interface:
+  display_name: "Repo Admin Hygiene"
+  short_description: "Standardize GitHub repo administration"
+  default_prompt: "Use $repo-admin-hygiene to inspect and standardize this repository's GitHub metadata, labels, license, defaults, templates, rulesets, and package metadata."

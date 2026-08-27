@@ -1,0 +1,4 @@
+interface:
+  display_name: "Commit Message Enforcer"
+  short_description: "Standardize enterprise commit messages"
+  default_prompt: "Use $commit-message-enforcer to review, write, or enforce clean Conventional Commit messages with standard scopes, breaking-change handling, and staged-diff alignment."

@@ -1,0 +1,4 @@
+interface:
+  display_name: "iOS TestFlight Release"
+  short_description: "Cut consistent iOS TestFlight builds"
+  default_prompt: "Use $ios-testflight-release-cycle to increment the iOS build, prepare release notes, archive/export/upload to App Store Connect, update TestFlight metadata, and assign the configured tester group."

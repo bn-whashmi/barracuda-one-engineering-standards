@@ -1,0 +1,4 @@
+interface:
+  display_name: "iOS Release QA"
+  short_description: "Validate iOS release candidates"
+  default_prompt: "Use $ios-release-qa to verify this iOS release candidate for environment locks, accessibility, iPad layout, physical-device flows, companion surfaces, push, billing, analytics, and release readiness."

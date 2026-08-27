@@ -1,0 +1,4 @@
+interface:
+  display_name: "Repo Bootstrap"
+  short_description: "Apply repo standards"
+  default_prompt: "Use $repo-bootstrap to onboard this repository to engineering standards for metadata, license, package metadata, labels, templates, Codex guidance, CI, and lightweight governance."

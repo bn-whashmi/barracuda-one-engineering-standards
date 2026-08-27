@@ -1,0 +1,84 @@
+{
+  "version": 1,
+  "providers": {
+    "snyk": {
+      "name": "Snyk",
+      "enabled": false,
+      "template": "workflows/snyk.yml",
+      "template_available": true,
+      "secrets": [
+        "SNYK_TOKEN"
+      ],
+      "controls": {
+        "snyk-code": {
+          "check_name": "Snyk Code",
+          "workflow": "Snyk",
+          "wait_for": true,
+          "change": "advisory",
+          "release": "advisory"
+        },
+        "snyk-open-source": {
+          "check_name": "Snyk Open Source",
+          "workflow": "Snyk",
+          "wait_for": true,
+          "change": "advisory",
+          "release": "advisory"
+        }
+      }
+    },
+    "semgrep": {
+      "name": "Semgrep",
+      "enabled": false,
+      "template": "workflows/semgrep.yml",
+      "template_available": true,
+      "secrets": [
+        "SEMGREP_APP_TOKEN"
+      ],
+      "controls": {
+        "semgrep": {
+          "check_name": "Semgrep",
+          "workflow": "Semgrep",
+          "wait_for": false,
+          "change": "advisory",
+          "release": "advisory"
+        }
+      }
+    },
+    "sonarqube": {
+      "name": "SonarQube",
+      "enabled": false,
+      "template": "workflows/sonar.yml",
+      "template_available": true,
+      "secrets": [
+        "SONAR_TOKEN"
+      ],
+      "controls": {
+        "sonarqube": {
+          "check_name": "SonarQube Quality Gate",
+          "workflow": "SonarQube",
+          "wait_for": false,
+          "change": "advisory",
+          "release": "advisory"
+        }
+      }
+    },
+    "fossa": {
+      "name": "FOSSA",
+      "enabled": false,
+      "template": "workflows/fossa.yml",
+      "template_available": true,
+      "secrets": [
+        "FOSSA_API_KEY"
+      ],
+      "controls": {
+        "fossa": {
+          "check_name": "FOSSA",
+          "workflow": "FOSSA",
+          "wait_for": false,
+          "change": "advisory",
+          "release": "advisory"
+        }
+      }
+    }
+  }
+}

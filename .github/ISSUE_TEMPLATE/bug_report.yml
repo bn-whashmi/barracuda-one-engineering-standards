@@ -1,0 +1,42 @@
+name: Bug report
+description: Report a bug
+title: "Bug: "
+labels: ["type:bug", "status:needs-triage"]
+body:
+  - type: textarea
+    id: summary
+    attributes:
+      label: Summary
+      description: What happened?
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      description: How can we reproduce it?
+      placeholder: |
+        1.
+        2.
+        3.
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+    validations:
+      required: false
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual behavior
+    validations:
+      required: false
+  - type: input
+    id: environment
+    attributes:
+      label: Environment
+      placeholder: OS, browser/runtime, version, etc.
+    validations:
+      required: false

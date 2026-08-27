@@ -1,0 +1,4 @@
+interface:
+  display_name: "Multi-Tenant SaaS Readiness"
+  short_description: "Audit tenant isolation and launch safety"
+  default_prompt: "Use $multi-tenant-saas-readiness to review this SaaS product for tenant isolation, auth tenancy, trusted routing, provisioning, impersonation, auditability, and production launch blockers."

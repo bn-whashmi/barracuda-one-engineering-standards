@@ -1,0 +1,4 @@
+interface:
+  display_name: "Data Model Migration Review"
+  short_description: "Review migration and persistence compatibility"
+  default_prompt: "Use $data-model-migration-review to inspect this repositories schema changes, migrations, and persistence compatibility risks."

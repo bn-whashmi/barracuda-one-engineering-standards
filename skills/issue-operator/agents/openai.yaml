@@ -1,0 +1,4 @@
+interface:
+  display_name: "Issue Operator"
+  short_description: "Deterministic GitHub issue sync for findings"
+  default_prompt: "Use $issue-operator to sync confirmed findings from project-audit-findings.md with GitHub issues, update or reopen tracked issues, and close resolved items only after verification evidence is recorded."

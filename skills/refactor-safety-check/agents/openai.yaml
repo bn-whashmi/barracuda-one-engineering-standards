@@ -1,0 +1,4 @@
+interface:
+  display_name: "Refactor Safety Check"
+  short_description: "Check refactors for hidden regression risk"
+  default_prompt: "Use $refactor-safety-check to review this change or refactor for hidden coupling, behavior regressions, and rollout safety."

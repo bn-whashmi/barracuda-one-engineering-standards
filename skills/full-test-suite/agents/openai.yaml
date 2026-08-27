@@ -1,0 +1,4 @@
+interface:
+  display_name: "Full Test Suite"
+  short_description: "Run the executable project ops audit suite"
+  default_prompt: "Use $full-test-suite to initialize or resume the bundle, drive the manifest loop, run the core or selected profile audit skills, apply verified fixes, sync GitHub issues, and continue until a clean post-fix full scan finds no actionable items."

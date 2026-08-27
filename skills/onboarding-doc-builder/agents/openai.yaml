@@ -1,0 +1,4 @@
+interface:
+  display_name: "Onboarding Doc Builder"
+  short_description: "Create clear onboarding docs from repo truth"
+  default_prompt: "Use $onboarding-doc-builder to create or refresh onboarding documentation that matches this repositories real setup and architecture."

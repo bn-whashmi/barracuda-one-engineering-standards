@@ -1,0 +1,90 @@
+name: Dependabot Verification
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    name: Dependabot Verification
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      GH_TOKEN: ${{ github.token }}
+      REVISION: ${{ github.event.pull_request.head.sha || github.sha }}
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          persist-credentials: false
+
+      - name: Verify Dependabot configuration and GitHub settings
+        run: |
+          set -u
+          config_status=failed
+          if test -f .github/dependabot.yml || test -f .github/dependabot.yaml; then
+            config_status=passed
+          fi
+
+          alerts_status=failed
+          if gh api "repos/${GITHUB_REPOSITORY}/vulnerability-alerts" >/dev/null 2>&1; then
+            alerts_status=passed
+          fi
+
+          security_updates=false
+          if security_updates="$(gh api "repos/${GITHUB_REPOSITORY}/automated-security-fixes" --jq '.enabled' 2>/dev/null)"; then
+            :
+          else
+            security_updates=false
+          fi
+
+          status=failed
+          if test "${config_status}" = passed \
+            && test "${alerts_status}" = passed \
+            && test "${security_updates}" = true; then
+            status=passed
+          fi
+
+          mkdir -p .artifacts/guardrails/evidence
+          CONFIG_STATUS="${config_status}" \
+          ALERTS_STATUS="${alerts_status}" \
+          SECURITY_UPDATES="${security_updates}" \
+          STATUS="${status}" \
+          python3 - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+
+          evidence = {
+              "version": 1,
+              "subject": {"type": "git-commit", "revision": os.environ["REVISION"]},
+              "checks": {
+                  "dependabot": {
+                      "producer": "GitHub Dependabot settings API",
+                      "status": os.environ["STATUS"],
+                      "evidence": [
+                          f"dependabot_config: {os.environ['CONFIG_STATUS']}",
+                          f"vulnerability_alerts: {os.environ['ALERTS_STATUS']}",
+                          f"automated_security_fixes: {os.environ['SECURITY_UPDATES']}",
+                      ],
+                  }
+              },
+          }
+          Path(".artifacts/guardrails/evidence/dependabot.json").write_text(
+              json.dumps(evidence, indent=2) + "\n", encoding="utf-8"
+          )
+          PY
+
+      - name: Run scorecard with Dependabot evidence
+        run: |
+          python3 .guardrails/scan.py \
+            --target . \
+            --policy .ai/guardrails.yaml \
+            --catalog .ai/control-catalog.yaml \
+            --evidence-dir .artifacts/guardrails/evidence \
+            --all-catalog-controls

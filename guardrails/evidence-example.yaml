@@ -1,0 +1,19 @@
+{
+  "version": 1,
+  "subject": {
+    "type": "git-commit",
+    "revision": "0123456789abcdef0123456789abcdef01234567"
+  },
+  "checks": {
+    "unit-tests": {
+      "producer": "repository test suite",
+      "status": "passed",
+      "evidence": ["command: python3 -m unittest"]
+    },
+    "codeql-sast": {
+      "producer": "repository SAST workflow",
+      "status": "not_run",
+      "reason": "SAST is not configured for this repository"
+    }
+  }
+}

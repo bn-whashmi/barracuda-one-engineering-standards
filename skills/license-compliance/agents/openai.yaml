@@ -1,0 +1,4 @@
+interface:
+  display_name: "License Compliance"
+  short_description: "Audit license posture"
+  default_prompt: "Use $license-compliance to audit and fix root license files, first-party package metadata, and vendored third-party license exceptions."

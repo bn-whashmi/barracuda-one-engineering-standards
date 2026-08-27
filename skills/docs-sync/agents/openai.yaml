@@ -1,0 +1,4 @@
+interface:
+  display_name: "Docs Sync"
+  short_description: "Keep repository docs aligned with code"
+  default_prompt: "Use $docs-sync to compare this repositorys code and workflows against its docs and fix concrete documentation drift."

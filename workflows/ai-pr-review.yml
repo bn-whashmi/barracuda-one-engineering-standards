@@ -1,0 +1,219 @@
+name: AI PR Review
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+  workflow_call:
+    inputs:
+      review-command:
+        description: Trusted repository-owned AI review adapter command.
+        required: false
+        type: string
+        default: ''
+      review-working-directory:
+        description: Directory in which the adapter runs.
+        required: false
+        type: string
+        default: '.'
+
+permissions:
+  contents: read
+  pull-requests: read
+
+jobs:
+  engineering:
+    name: AI Engineering Review
+    runs-on: ubuntu-latest
+    env:
+      AI_REVIEW_ROLE: engineering
+      AI_REVIEW_COMMAND: ${{ inputs.review-command || vars.AI_REVIEW_COMMAND }}
+      AI_REVIEW_RESULT: .ai-review/results/engineering.json
+      AI_REVIEW_WORKING_DIRECTORY: ${{ inputs.review-working-directory || vars.AI_REVIEW_WORKING_DIRECTORY || '.' }}
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          persist-credentials: false
+      - name: Run engineering reviewer adapter
+        working-directory: ${{ env.AI_REVIEW_WORKING_DIRECTORY }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [[ -z "${AI_REVIEW_COMMAND}" ]]; then
+            echo "Configure AI_REVIEW_COMMAND or workflow_call input review-command." >&2
+            exit 1
+          fi
+          mkdir -p .ai-review/results
+          AI_REVIEW_ROLE="${AI_REVIEW_ROLE}" AI_REVIEW_RESULT="${AI_REVIEW_RESULT}" bash -euo pipefail -c "${AI_REVIEW_COMMAND}"
+          test -s "${AI_REVIEW_RESULT}"
+          jq -e 'type == "object" and (.findings | type == "array")' "${AI_REVIEW_RESULT}" > /dev/null
+      - name: Upload engineering findings
+        if: ${{ always() && hashFiles(format('{0}/.ai-review/results/{1}.json', env.AI_REVIEW_WORKING_DIRECTORY, env.AI_REVIEW_ROLE)) != '' }}
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: ai-review-engineering
+          path: ${{ env.AI_REVIEW_WORKING_DIRECTORY }}/.ai-review/results/engineering.json
+          if-no-files-found: error
+
+  qa:
+    name: AI QA Review
+    runs-on: ubuntu-latest
+    env:
+      AI_REVIEW_ROLE: qa
+      AI_REVIEW_COMMAND: ${{ inputs.review-command || vars.AI_REVIEW_COMMAND }}
+      AI_REVIEW_RESULT: .ai-review/results/qa.json
+      AI_REVIEW_WORKING_DIRECTORY: ${{ inputs.review-working-directory || vars.AI_REVIEW_WORKING_DIRECTORY || '.' }}
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          persist-credentials: false
+      - name: Run QA reviewer adapter
+        working-directory: ${{ env.AI_REVIEW_WORKING_DIRECTORY }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [[ -z "${AI_REVIEW_COMMAND}" ]]; then
+            echo "Configure AI_REVIEW_COMMAND or workflow_call input review-command." >&2
+            exit 1
+          fi
+          mkdir -p .ai-review/results
+          AI_REVIEW_ROLE="${AI_REVIEW_ROLE}" AI_REVIEW_RESULT="${AI_REVIEW_RESULT}" bash -euo pipefail -c "${AI_REVIEW_COMMAND}"
+          test -s "${AI_REVIEW_RESULT}"
+          jq -e 'type == "object" and (.findings | type == "array")' "${AI_REVIEW_RESULT}" > /dev/null
+      - name: Upload QA findings
+        if: ${{ always() && hashFiles(format('{0}/.ai-review/results/{1}.json', env.AI_REVIEW_WORKING_DIRECTORY, env.AI_REVIEW_ROLE)) != '' }}
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: ai-review-qa
+          path: ${{ env.AI_REVIEW_WORKING_DIRECTORY }}/.ai-review/results/qa.json
+          if-no-files-found: error
+
+  security:
+    name: AI Security Review
+    runs-on: ubuntu-latest
+    env:
+      AI_REVIEW_ROLE: security
+      AI_REVIEW_COMMAND: ${{ inputs.review-command || vars.AI_REVIEW_COMMAND }}
+      AI_REVIEW_RESULT: .ai-review/results/security.json
+      AI_REVIEW_WORKING_DIRECTORY: ${{ inputs.review-working-directory || vars.AI_REVIEW_WORKING_DIRECTORY || '.' }}
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          persist-credentials: false
+      - name: Run security reviewer adapter
+        working-directory: ${{ env.AI_REVIEW_WORKING_DIRECTORY }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [[ -z "${AI_REVIEW_COMMAND}" ]]; then
+            echo "Configure AI_REVIEW_COMMAND or workflow_call input review-command." >&2
+            exit 1
+          fi
+          mkdir -p .ai-review/results
+          AI_REVIEW_ROLE="${AI_REVIEW_ROLE}" AI_REVIEW_RESULT="${AI_REVIEW_RESULT}" bash -euo pipefail -c "${AI_REVIEW_COMMAND}"
+          test -s "${AI_REVIEW_RESULT}"
+          jq -e 'type == "object" and (.findings | type == "array")' "${AI_REVIEW_RESULT}" > /dev/null
+      - name: Upload security findings
+        if: ${{ always() && hashFiles(format('{0}/.ai-review/results/{1}.json', env.AI_REVIEW_WORKING_DIRECTORY, env.AI_REVIEW_ROLE)) != '' }}
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: ai-review-security
+          path: ${{ env.AI_REVIEW_WORKING_DIRECTORY }}/.ai-review/results/security.json
+          if-no-files-found: error
+
+  repo-standards:
+    name: AI Repo Standards Review
+    runs-on: ubuntu-latest
+    env:
+      AI_REVIEW_ROLE: repo-standards
+      AI_REVIEW_COMMAND: ${{ inputs.review-command || vars.AI_REVIEW_COMMAND }}
+      AI_REVIEW_RESULT: .ai-review/results/repo-standards.json
+      AI_REVIEW_WORKING_DIRECTORY: ${{ inputs.review-working-directory || vars.AI_REVIEW_WORKING_DIRECTORY || '.' }}
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          persist-credentials: false
+      - name: Run repository standards adapter
+        working-directory: ${{ env.AI_REVIEW_WORKING_DIRECTORY }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [[ -z "${AI_REVIEW_COMMAND}" ]]; then
+            echo "Configure AI_REVIEW_COMMAND or workflow_call input review-command." >&2
+            exit 1
+          fi
+          mkdir -p .ai-review/results
+          AI_REVIEW_ROLE="${AI_REVIEW_ROLE}" AI_REVIEW_RESULT="${AI_REVIEW_RESULT}" bash -euo pipefail -c "${AI_REVIEW_COMMAND}"
+          test -s "${AI_REVIEW_RESULT}"
+          jq -e 'type == "object" and (.findings | type == "array")' "${AI_REVIEW_RESULT}" > /dev/null
+      - name: Upload repository standards findings
+        if: ${{ always() && hashFiles(format('{0}/.ai-review/results/{1}.json', env.AI_REVIEW_WORKING_DIRECTORY, env.AI_REVIEW_ROLE)) != '' }}
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: ai-review-repo-standards
+          path: ${{ env.AI_REVIEW_WORKING_DIRECTORY }}/.ai-review/results/repo-standards.json
+          if-no-files-found: error
+
+  consolidate:
+    name: AI PR Review Consolidation
+    if: ${{ always() }}
+    needs: [engineering, qa, security, repo-standards]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          persist-credentials: false
+      - name: Download reviewer results
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        with:
+          pattern: ai-review-*
+          path: .ai-review/results
+          merge-multiple: true
+      - name: Consolidate findings and enforce blocking severity
+        env:
+          ENGINEERING_RESULT: ${{ needs.engineering.result }}
+          QA_RESULT: ${{ needs.qa.result }}
+          SECURITY_RESULT: ${{ needs.security.result }}
+          REPO_STANDARDS_RESULT: ${{ needs.repo-standards.result }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          shopt -s nullglob
+          results=(.ai-review/results/*.json)
+          if (( ${#results[@]} == 0 )); then
+            echo "No AI reviewer result files were produced." >&2
+            exit 1
+          fi
+          jq -s 'map(.findings // []) | flatten' "${results[@]}" > .ai-review/consolidated-findings.json
+          blocking_count="$(jq '[.[] | select((.severity == "P0" or .severity == "P1") and ((.status // "open") != "resolved"))] | length' .ai-review/consolidated-findings.json)"
+          cat .ai-review/consolidated-findings.json
+          if (( blocking_count > 0 )); then
+            echo "${blocking_count} unresolved P0/P1 AI review finding(s) remain." >&2
+            exit 1
+          fi
+          for result in "${ENGINEERING_RESULT}" "${QA_RESULT}" "${SECURITY_RESULT}" "${REPO_STANDARDS_RESULT}"; do
+            if [[ "${result}" != "success" ]]; then
+              echo "At least one AI reviewer did not complete successfully." >&2
+              exit 1
+            fi
+          done
+      - name: Upload consolidated findings
+        if: ${{ always() }}
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: ai-review-consolidated
+          path: .ai-review/consolidated-findings.json
+          if-no-files-found: warn
+
+# This workflow defines the provider-neutral contract. The consuming repository
+# supplies a trusted adapter command; no AI provider or API credential is
+# hardcoded here.

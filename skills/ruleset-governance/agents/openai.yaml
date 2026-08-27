@@ -1,0 +1,4 @@
+interface:
+  display_name: "Ruleset Governance"
+  short_description: "Design lightweight GitHub rulesets"
+  default_prompt: "Use $ruleset-governance to inspect this repository's branch, tag, and push protection and recommend or apply lightweight rulesets appropriate for the repository workflow."

@@ -1,0 +1,4 @@
+interface:
+  display_name: "Bug Hunter"
+  short_description: "Evidence-based bug finding and triage"
+  default_prompt: "Use $bug-hunter to inspect this codebase for verified correctness bugs, build a fix queue, and validate real defects only."
