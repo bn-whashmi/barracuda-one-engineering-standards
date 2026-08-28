@@ -275,6 +275,16 @@ class ActionDistributionTests(unittest.TestCase):
                 self.assertIn("--policy .guardrails/policy.yaml", text)
                 self.assertIn("--catalog .guardrails/control-catalog.yaml", text)
 
+    def test_scorecard_waits_for_supported_external_producers(self) -> None:
+        for workflow in (
+            ".github/workflows/guardrail-checks.yml",
+            "docs/examples/guardrails.yml",
+        ):
+            with self.subTest(workflow=workflow):
+                text = (ROOT / workflow).read_text(encoding="utf-8")
+                self.assertIn("--wait-seconds 600", text)
+                self.assertIn("timeout-minutes: 15", text)
+
     def test_attestation_workflow_uses_canonical_policy(self) -> None:
         text = (
             ROOT / ".github" / "workflows" / "guardrails-attestation.yml"
@@ -294,7 +304,9 @@ class ActionDistributionTests(unittest.TestCase):
         self.assertIn("secret-scanning/alerts", text)
         self.assertIn("head_sha", text)
         self.assertIn("checks: write", text)
-        self.assertIn("no-checkout verifier", text)
+        self.assertIn("CHECKS_TOKEN: ${{ github.token }}", text)
+        self.assertIn('GH_TOKEN="${CHECKS_TOKEN}" gh api', text)
+        self.assertIn("no-checkout evidence probe", text)
         self.assertNotIn("actions/checkout@", text)
         org = (ROOT / ".github" / "workflows" / "organization-secret-scan.yml").read_text(
             encoding="utf-8"
@@ -302,6 +314,101 @@ class ActionDistributionTests(unittest.TestCase):
         self.assertIn("Secret Scan / organization scanner", org)
         self.assertIn("pull_request:", org)
         self.assertNotIn("SECURITY_SETTINGS_TOKEN", org)
+
+    def test_secret_scan_verifier_is_skipped_without_a_credential(self) -> None:
+        text = (ROOT / ".github" / "workflows" / "secret-scan.yml").read_text(
+            encoding="utf-8"
+        )
+        configuration, verifier = text.split("  verifier:\n", 1)
+
+        self.assertIn("  configuration:\n", configuration)
+        self.assertIn("name: Secret Scan Configuration", configuration)
+        self.assertIn(
+            "token_configured: ${{ steps.detect.outputs.token_configured }}",
+            configuration,
+        )
+        self.assertIn(
+            "if: steps.detect.outputs.token_configured != 'true'",
+            configuration,
+        )
+        self.assertIn('conclusion:"skipped"', configuration)
+        self.assertIn("needs: configuration", verifier)
+        self.assertIn(
+            "if: needs.configuration.outputs.token_configured == 'true'",
+            verifier,
+        )
+        self.assertNotIn(
+            'reason="SECURITY_SETTINGS_TOKEN is not configured."',
+            verifier,
+        )
+
+    def test_secret_scan_job_name_does_not_claim_the_control_passed(self) -> None:
+        text = (ROOT / ".github" / "workflows" / "secret-scan.yml").read_text(
+            encoding="utf-8"
+        )
+
+        self.assertIn("name: Secret Scan Evidence Probe", text)
+        self.assertNotIn("name: Secret Scan Platform Verifier", text)
+
+    def test_snyk_placeholder_secret_does_not_activate_scans(self) -> None:
+        text = (ROOT / ".github" / "workflows" / "snyk.yml").read_text(
+            encoding="utf-8"
+        )
+
+        self.assertIn(
+            '"${SNYK_TOKEN}" == "GUARDRAILS_NOT_CONFIGURED"',
+            text,
+        )
+
+    def test_semgrep_placeholder_secret_does_not_activate_scans(self) -> None:
+        template = (ROOT / "workflows" / "semgrep.yml").read_text(
+            encoding="utf-8"
+        )
+
+        self.assertIn(
+            '"${SEMGREP_APP_TOKEN}" == "GUARDRAILS_NOT_CONFIGURED"',
+            template,
+        )
+
+    def test_repository_runs_the_distributed_semgrep_workflow(self) -> None:
+        installed = ROOT / ".github" / "workflows" / "semgrep.yml"
+        template = ROOT / "workflows" / "semgrep.yml"
+
+        self.assertTrue(installed.is_file())
+        self.assertEqual(template.read_bytes(), installed.read_bytes())
+
+    def test_repository_selects_configured_security_providers_as_advisory(self) -> None:
+        policy = json.loads(
+            (ROOT / ".guardrails" / "policy.yaml").read_text(encoding="utf-8")
+        )
+        providers = json.loads(
+            (ROOT / ".guardrails" / "providers.yaml").read_text(encoding="utf-8")
+        )
+        manifest = json.loads(
+            (ROOT / ".guardrails" / "producer-manifest.json").read_text(
+                encoding="utf-8"
+            )
+        )
+        expected_controls = {"snyk-code", "semgrep"}
+        unavailable_controls = {"snyk-open-source"}
+
+        self.assertTrue(providers["providers"]["snyk"]["enabled"])
+        self.assertTrue(providers["providers"]["semgrep"]["enabled"])
+        for operation in ("change", "release"):
+            self.assertTrue(
+                expected_controls.issubset(policy["operations"][operation]["advisory"])
+            )
+            self.assertTrue(
+                unavailable_controls.isdisjoint(
+                    policy["operations"][operation]["advisory"]
+                )
+            )
+        producers = {
+            item["control_id"]: item for item in manifest["producers"]
+        }
+        self.assertTrue(expected_controls.issubset(producers))
+        self.assertTrue(unavailable_controls.isdisjoint(producers))
+        self.assertTrue(producers["semgrep"]["wait_for"])
 
     def test_codeql_workflow_publishes_the_manifest_check_name(self) -> None:
         text = (ROOT / ".github" / "workflows" / "codeql.yml").read_text(

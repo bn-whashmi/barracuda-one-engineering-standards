@@ -27,15 +27,16 @@ scanning and the Dependency Graph must be enabled in repository settings before
 their checks can run.
 
 Secret Scanning is a platform capability and does not create a standard PR
-check by itself. The shared `Secret Scan` verifier is therefore conditional on
-the `SECURITY_SETTINGS_TOKEN` Actions secret: use a narrowly scoped GitHub App
-or fine-grained token that can read repository security settings. Without that
-credential, or when the credential cannot read the settings, the verifier
-reports `NO RESULT` and the scorecard remains advisory; this is different from
-Secret Scanning being disabled. The verifier reads settings with the protected
-credential and publishes its PR check with the ordinary Actions token. An
-optional organization scanner is a separate check and cannot prove the GitHub
-platform setting.
+check by itself. The shared `Secret Scan` evidence probe is therefore
+conditional on the `SECURITY_SETTINGS_TOKEN` Actions secret: use a narrowly
+scoped GitHub App or fine-grained token with repository `Administration` read
+and `Secret scanning alerts` read access. Without that credential, or when the
+credential cannot read the settings, the evidence probe reports `NO RESULT`
+and the scorecard remains advisory; this is different from Secret Scanning
+being disabled. The evidence probe reads settings with the protected credential
+and publishes its PR check with the ordinary Actions token. An optional
+organization scanner is a separate check and cannot prove the GitHub platform
+setting.
 
 Artifact provenance is an advisory supply-chain control. The
 `artifact-provenance.yml` template uses GitHub Artifact Attestations to bind a
@@ -70,11 +71,13 @@ The workflow installed by `install.py --github-actions` is
 revision, collects producer check results through
 `.guardrails/github_evidence.py`, and runs the installed scanner.
 Evidence is evaluated against the exact revision named by the pull request,
-not against GitHub's synthetic merge ref. Existing consumer-owned workflows are
-preserved during refresh; review and retire an older attestation workflow
-separately if one is already present. Scorecard comments are published only for
-same-repository, non-Dependabot pull requests; all other runs use the job
-summary and artifact path.
+not against GitHub's synthetic merge ref. The installed collector waits up to
+600 seconds for selected asynchronous producers such as Semgrep; after that,
+an unfinished advisory producer is reported as `NO RESULT`, never as passed.
+Existing consumer-owned workflows are preserved during refresh; review and
+retire an older attestation workflow separately if one is already present.
+Scorecard comments are published only for same-repository, non-Dependabot pull
+requests; all other runs use the job summary and artifact path.
 
 ## Choose an installation mode
 
@@ -189,6 +192,13 @@ whether CodeQL or Snyk Code is the primary source-code SAST gate.
 Snyk checks are advisory by default; a consuming repository may add the real
 check names to its ruleset after the producer meets the shared promotion rule.
 
+GitHub does not support empty Actions secrets. This repository reserves an
+inactive `SNYK_TOKEN` name with the exact value `GUARDRAILS_NOT_CONFIGURED`;
+the example workflow treats that sentinel as absent and skips both scans.
+Replace the value with a real Snyk credential before enabling the provider.
+Do not use an arbitrary dummy value because any other non-empty value is
+treated as a configured credential.
+
 ### Semgrep
 
 `semgrep.yml` is the verified Semgrep provider template. It runs `semgrep ci`
@@ -197,6 +207,10 @@ the `SEMGREP_APP_TOKEN` Actions secret before enabling the provider. Keep it
 advisory while rules and thresholds are tuned. Move it to enforced only after
 the producer meets the shared promotion rule. The template does not define a
 fake organization rule set or pass credentials to any other workflow.
+
+The reserved value `GUARDRAILS_NOT_CONFIGURED` keeps the workflow installed but
+inactive. Replace it with a real token to run Semgrep; an empty or reserved
+value produces configuration evidence and skips the provider scan.
 
 When a workflow produces guardrail evidence, write a check-specific JSON file
 under `.artifacts/guardrails/evidence/`. The installed `scan.py` command merges

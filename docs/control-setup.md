@@ -33,6 +33,114 @@ so required manual configuration moves happen before any known-artifact
 cleanup. Refresh preserves an existing consumer workflow; update workflow files
 through the consuming repository's normal pull-request process.
 
+## Secrets and variables checklist
+
+Create credentials only for controls the repository has selected. A secret's
+presence is not evidence that its producer ran, and a placeholder credential
+can turn an intentionally inactive workflow into a failing one.
+
+GitHub does not support an empty Actions secret. This standards repository may
+reserve an inactive provider secret name with the exact value
+`GUARDRAILS_NOT_CONFIGURED`; replace that value before enabling the provider.
+Do not use any other dummy value: workflows can mistake an arbitrary non-empty
+value for an active credential. Consumer repositories should normally create
+the secret only when the real provider credential is available.
+
+### GitHub Actions secrets
+
+| Secret | Used by | Create the credential | Minimum access |
+| --- | --- | --- | --- |
+| `SECURITY_SETTINGS_TOKEN` | GitHub Secret Scan evidence probe | Create a fine-grained GitHub PAT or GitHub App token. Select only the repository being verified. | Repository `Administration: read` and `Secret scanning alerts: read`; `Metadata: read` is added automatically. No account permissions. |
+| `SONAR_TOKEN` | SonarQube | Generate a project analysis token or a narrowly scoped user analysis token in SonarQube. | Execute Analysis for the configured project. |
+| `SNYK_TOKEN` | Snyk Code and Snyk Open Source | Use a Snyk service-account token for durable automation where the plan supports it; otherwise use the CI token approved by the Snyk administrator. | Access to the organization and project being scanned. |
+| `SEMGREP_APP_TOKEN` | Semgrep | Generate the token in Semgrep AppSec Platform settings after connecting the repository. | Access to the Semgrep deployment and repository scan configuration. |
+| `FOSSA_API_KEY` | FOSSA | Create a FOSSA CI/service token. Prefer the least-privileged token type that supports both analysis upload and the configured policy check. | Access to the application project and policy used by CI. |
+
+Provider references: [GitHub fine-grained PATs](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens),
+[SonarQube tokens](https://docs.sonarsource.com/sonarqube-server/user-guide/managing-tokens),
+[Snyk CI authentication](https://docs.snyk.io/snyk-cli/authenticate-to-use-the-cli),
+[Semgrep GitHub Actions](https://semgrep.dev/docs/semgrep-ci/sample-ci-configs),
+and [FOSSA API tokens](https://docs.fossa.com/docs/organization-management/api-tokens).
+
+Add a real value without putting it in the command line or shell history. The
+GitHub CLI prompts for the value and encrypts it before upload:
+
+```sh
+gh secret set SECURITY_SETTINGS_TOKEN --repo OWNER/REPOSITORY
+gh secret set SONAR_TOKEN --repo OWNER/REPOSITORY
+gh secret set SNYK_TOKEN --repo OWNER/REPOSITORY
+gh secret set SEMGREP_APP_TOKEN --repo OWNER/REPOSITORY
+gh secret set FOSSA_API_KEY --repo OWNER/REPOSITORY
+```
+
+Run only the command for each activated control. For organization secrets, set
+an explicit repository access policy rather than granting every repository
+access by default. Verify names without exposing values:
+
+```sh
+gh secret list --repo OWNER/REPOSITORY
+```
+
+### GitHub Actions variables and platform settings
+
+Variables are non-sensitive and may appear in logs. Never put a token or API
+key in a variable.
+
+| Control | Required variables | Optional variables or settings |
+| --- | --- | --- |
+| Dependency Review | `DEPENDENCY_GRAPH_ENABLED=true`, after enabling Dependency Graph | `DEPENDENCY_FAIL_ON_SEVERITY` |
+| SonarQube | `SONAR_HOST_URL`, `SONAR_PROJECT_KEY` | `SONAR_PROJECT_BASE_DIRECTORY`, `SONAR_ARGS` |
+| FOSSA | `FOSSA_COMMAND` | Repository-owned policy and project configuration |
+| GitHub Secret Scan | Enable Secret Scanning and push protection in repository settings | `SECRET_SCAN_COMMAND` only when an additional organization scanner is installed |
+| AI reviews | `AI_REVIEW_COMMAND` | `AI_REVIEW_WORKING_DIRECTORY`; any provider credential remains adapter-specific |
+| Build and tests | Repository-specific build and test commands | Working directory, coverage path, and coverage enforcement variables |
+
+For example:
+
+```sh
+gh variable set DEPENDENCY_GRAPH_ENABLED --body true \
+  --repo OWNER/REPOSITORY
+gh variable set SONAR_HOST_URL --body https://sonar.example.com \
+  --repo OWNER/REPOSITORY
+gh variable set SONAR_PROJECT_KEY --body my-project \
+  --repo OWNER/REPOSITORY
+gh variable list --repo OWNER/REPOSITORY
+```
+
+The installer never copies credentials. It installs workflow and configuration
+interfaces; the consuming repository or organization owns provider accounts,
+credential rotation, and repository access.
+
+### Activate a provider completely
+
+A provider is active only when all three pieces agree:
+
+1. Its real credential is stored as a repository secret.
+2. Its producer workflow exists in `.github/workflows/` and runs successfully.
+3. Its provider is enabled and synchronized into the repository policy and
+   producer manifest.
+
+For example:
+
+```sh
+python3 /path/to/engineering-standards/tooling/install.py \
+  --target . \
+  --github-actions \
+  --provider snyk \
+  --provider semgrep \
+  --refresh-existing
+python3 .guardrails/configure.py \
+  --enable-provider snyk \
+  --enable-provider semgrep \
+  --sync-providers
+```
+
+Then open or update a pull request. A successful configuration job alone is
+not scan evidence: confirm the applicable provider checks themselves, followed
+by the updated Guardrail Scorecard. Select `Snyk Open Source` only when the
+repository has a supported dependency manifest; a no-manifest job is not
+dependency-scan evidence.
+
 ## Repository Validation
 
 **Protects:** the repository contracts that make the standards and Guardrails
@@ -234,9 +342,11 @@ workflow cannot enable them.
 The repository API exposes these settings only to an administrator. To have
 the PR scorecard verify them as a `GitHub Secret Scan` check, add a narrowly scoped
 fine-grained GitHub token or GitHub App token as the `SECURITY_SETTINGS_TOKEN`
-Actions secret. The trusted `pull_request_target` verifier does not check out
+Actions secret. Grant only repository `Administration` read and `Secret
+scanning alerts` read access, scoped to the repository being verified. The
+trusted `pull_request_target` evidence probe does not check out
 PR code; it publishes the result explicitly against the PR head SHA. Without
-that credential the verifier publishes `NO RESULT`; it never treats an
+that credential the publisher records `NO RESULT`; it never treats an
 unprivileged token or a workflow's existence as proof of activation. The
 optional organization scanner runs separately on `pull_request`, without
 credentials, and its result is included when configured.
@@ -489,6 +599,10 @@ invent or embed organization-specific rules. Semgrep starts **Advisory**. Move
 it to **Enforced** and add the exact `Semgrep` check to the ruleset only after
 it meets the shared promotion rule. Semgrep's documented GitHub Actions setup
 requires a repository workflow and `SEMGREP_APP_TOKEN` secret.
+
+The exact placeholder value `GUARDRAILS_NOT_CONFIGURED` keeps the installed
+workflow inactive. Replace that value with a real token to activate the scan;
+do not use arbitrary dummy credentials.
 [Semgrep GitHub reusable workflow
 documentation](https://semgrep.dev/docs/kb/semgrep-ci/github-reusable-workflows-semgrep)
 is the provider reference.
