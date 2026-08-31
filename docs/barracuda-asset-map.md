@@ -11,7 +11,7 @@ reference them, do not fork their content into this repo.
 | Nexus architectural patterns | `nexus-architecture/standards/nexus-specific-patterns.md` | 757 lines: DI lifetimes, Redis key naming, error propagation, Kafka, Dapr, health checks, OTel, GraphQL, advisory locks |
 | Convention audit methodology | `nexus-architecture/repo-auditing/` | Scored baseline audits per repo, strict-vs-guideline enforcement split, AI-compliance pilot results |
 | AI development lifecycle | `aidlc-rules/` (v1.0.1, 32 files) | Full adaptive AI-DLC: inception/construction phases, security baselines, content validation, audit logging |
-| AI requirements checklist | [reference/ai-requirements-questions.md](reference/ai-requirements-questions.md) | 300+ line questionnaire for AI code generation: functional, NFR, multi-tenant, testing, pitfalls |
+| AI requirements checklist | [reference/ai-requirements-checklist.md](reference/ai-requirements-checklist.md) | Generic pre-generation and pre-merge questionnaire: functional, NFR, tenancy, testing, pitfalls (distilled from platform practice; feature-specific requirement docs stay in Jira) |
 | BDS conventions + skills | `nexus-ui-host/.claude/bds-guides/`, `.claude/skills/` | Design-system rules, anti-patterns, compliance-check skills, token references |
 
 ## CI/CD Assets
