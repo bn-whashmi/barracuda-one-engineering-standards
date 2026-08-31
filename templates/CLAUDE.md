@@ -43,7 +43,8 @@ Do not commit if any check fails.
 
 ## CI/CD
 
-- Branch: `feature/{username}-NEX-{ticket}`; PR title must include NEX-xxxxx.
+- Branch: `{type}/NEX-{ticket}` (e.g. `feature/NEX-1234`, `issue/NEX-1234`);
+  PR title must include NEX-xxxxx.
 - GitHub Actions with `barracuda-internal/nexus-actions@v2`; ArgoCD GitOps.
 - Jira transitions are automated on PR open and merge.
 

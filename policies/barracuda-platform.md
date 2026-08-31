@@ -22,7 +22,8 @@ inventory.
 
 ## Commit and Branch Conventions
 
-- Branch naming: `feature/{username}-NEX-{ticket}`.
+- Branch naming: `{type}/NEX-{ticket}` where type is `feature`, `issue`,
+  etc. — e.g. `feature/NEX-1234`, `issue/NEX-1234`.
 - PR titles must include the Jira ticket (`NEX-xxxxx`) — enforced by
   `barracuda-internal/nexus-actions/pull-request-title-validator@v2`.
 - Jira automation: PR open moves the ticket to Pending Review; merge to main
