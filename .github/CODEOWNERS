@@ -1,0 +1,19 @@
+# Code ownership for the Barracuda engineering-standards repository.
+# PLACEHOLDER team slugs — update to real GitHub team handles before relying
+# on this file; GitHub silently ignores unknown owners.
+
+* @barracuda/platform-engineering
+
+# Policy and enforcement changes affect every consuming repository
+/policies/ @barracuda/platform-engineering
+/guardrails/ @barracuda/platform-engineering
+/.guardrails/ @barracuda/platform-engineering
+/rulesets/ @barracuda/platform-engineering
+
+# Security rules require security review
+/security/ @barracuda/security-engineering
+/policies/security.md @barracuda/security-engineering
+
+# Workflow changes are supply-chain sensitive
+/workflows/ @barracuda/platform-engineering
+/.github/workflows/ @barracuda/platform-engineering

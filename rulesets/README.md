@@ -62,3 +62,17 @@ steps first.
 
 See [control setup](../docs/control-setup.md), [status](../docs/control-status.md),
 and [workflow guidance](../workflows/README.md).
+
+## Barracuda organization rulesets
+
+At Barracuda, baseline branch protection (PR required, no force push, no
+deletion, review-thread resolution) is owned by the **organization-level
+ruleset** - do not duplicate those rules per repository. Verify coverage
+under Settings -> Rules -> Rulesets; if a repo falls outside the org
+ruleset's targeting, raise it with the org admins.
+
+The per-repository concern is required status checks only. Import
+[barracuda-required-status-checks.json](barracuda-required-status-checks.json)
+(ships with an empty check list) and add each control's exact status context
+one at a time as it is promoted to enforced - see
+[../docs/barracuda-adoption.md](../docs/barracuda-adoption.md).

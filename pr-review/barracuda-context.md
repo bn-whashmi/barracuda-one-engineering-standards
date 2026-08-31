@@ -1,0 +1,50 @@
+# Barracuda Review Context
+
+Platform context for all four AI review lenses when reviewing Nexus /
+BarracudaONE repositories. Read together with the generic guides in this
+directory.
+
+## Intentional Patterns — Do Not Flag as Bugs
+
+- **Fail-open Redis and Intercom**: catching connection/timeout exceptions,
+  logging a warning, and returning default is the required pattern.
+- **Production error masking**: generic error copy with a small whitelist
+  (`"Invalid Session"`, `"Unauthenticated"`, `DEMO_ACCOUNT_OPERATION_NOT_ALLOWED`,
+  `INVALID_EMAIL_FORMAT`) is by design (RFC 7807).
+- **Gateway-delegated JWT validation**: backend services behind the mesh
+  gateway intentionally disable issuer/audience/lifetime validation; the
+  gateway is the auth boundary. Flag it only on services exposed directly to
+  the internet (e.g. entraid-service endpoints, which must validate fully).
+
+## Platform-Specific Checks
+
+Engineering:
+- `ConfigureAwait(false)` on library async paths; never `.Result`/`.Wait()`.
+- DI lifetimes per nexus-specific-patterns §1 (singleton for token-caching,
+  scoped for per-request business logic).
+- Redis keys follow `{service}:{entity}:{identifier}`.
+- OTel metrics use the `nexus_*` prefix; health values 0/1/2.
+- BDS imports only from `@barracuda-internal/bds-core`.
+- GraphQL schema changes preserve backward compatibility unless authorized.
+
+Security:
+- Every tenant-scoped query filters by `tenantId`; cross-tenant access is P0.
+- RDS via IAM tokens, S3 via IAM roles, Kafka via SASL/SSL, KMS at rest.
+- No tokens, invite codes, session artifacts, or raw customer payloads in
+  logs or AI prompts.
+- FIDO MFA and Entra ID integration changes are high-risk.
+
+QA:
+- Coverage: 80% for .NET/gateway, 100% functions+lines for nexus-ui-host.
+- Fail-open paths need both cache-hit and cache-miss tests.
+- Frontend tests colocated in `unit-tests/` directories.
+
+Repo standards:
+- Canonical ground truth: `nexus-architecture/standards/` and each repo's
+  `CLAUDE.md`/`AGENTS.md`. Report missing docs as a gap, never invent rules.
+
+## High-Risk Surfaces (Escalate to Domain Owner)
+
+Authentication/authorization, tenant isolation, billing, customer data,
+deployment configuration (Terraform/Helm/ArgoCD), Kafka topics and schema
+registry, and GraphQL authorization changes.

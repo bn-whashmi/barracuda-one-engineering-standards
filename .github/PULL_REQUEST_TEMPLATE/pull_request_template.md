@@ -22,3 +22,9 @@
 - Required checks:
 - Advisory findings:
 - Decision:
+
+## Barracuda
+
+- [ ] PR title includes the Jira ticket (NEX-xxxxx)
+- [ ] Infrastructure changes have been applied to the dev environment
+- [ ] High-risk surface (auth / tenant isolation / billing / infra)? Domain owner tagged

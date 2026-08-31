@@ -1,8 +1,11 @@
-# Engineering Standards
+# BarracudaONE Engineering Standards
 
-Executable engineering standards for faster, safer software delivery.
+Executable engineering standards for faster, safer software delivery across
+Barracuda's Nexus / BarracudaONE platform. Built on the upstream
+[engineering-standards](https://github.com/ravisingh11/engineering-standards)
+Guardrails v2 runtime (MIT), with a Barracuda-specific layer on top.
 
-[![Guardrail Scorecard](https://github.com/ravisingh11/engineering-standards/actions/workflows/guardrails-scorecard.yml/badge.svg?branch=main)](https://github.com/ravisingh11/engineering-standards/actions/workflows/guardrails-scorecard.yml)
+[![Guardrail Scorecard](https://github.com/bn-whashmi/barracuda-one-engineering-standards/actions/workflows/guardrails-scorecard.yml/badge.svg?branch=main)](https://github.com/bn-whashmi/barracuda-one-engineering-standards/actions/workflows/guardrails-scorecard.yml)
 
 AI has made it faster than ever to create and change software. That speed makes
 strong engineering standards more important, not less. Practices that once
@@ -22,6 +25,17 @@ rulesets, and shared agent skills.
 Application repositories keep their own architecture and operating details.
 This project supplies the common engineering backbone without inventing
 repository-specific ground truth.
+
+## Barracuda layer
+
+Nexus / BarracudaONE repositories start here:
+
+- [Barracuda platform policy](policies/barracuda-platform.md) - platform-specific requirements layered on the generic policies.
+- [Three-tier control model](docs/barracuda-three-tier-model.md) - Mechanical / 3rd Party / AI lens over the control catalog.
+- [Barracuda adoption guide](docs/barracuda-adoption.md) - tier-by-tier rollout for Nexus repos, including known CI gaps.
+- [Barracuda asset map](docs/barracuda-asset-map.md) - canonical platform assets (nexus-architecture standards, nexus-actions, aidlc-rules, TFLint) this repo builds on.
+- [Barracuda review context](pr-review/barracuda-context.md) - intentional platform patterns AI reviewers must not flag.
+- [Barracuda Semgrep rules](security/semgrep/barracuda.yml) - org rules with tested fixtures.
 
 ## Guardrails v2 model
 
