@@ -23,6 +23,12 @@ inventory.
 
 ## Commit and Branch Conventions
 
+- Commit messages start with the Jira ticket: `NEX-{ticket} <imperative
+  summary>` — e.g. `NEX-6449 Rename risk record update timestamp`. This
+  replaces the conventional `type:` prefixes in the generic
+  [commit-messages policy](commit-messages.md) for Nexus repositories; the
+  rest of that policy (imperative voice, ≤72 chars, outcome not file list,
+  no secrets) still applies.
 - Branch naming: `{type}/{username}-NEX-{ticket}` where type is `feature`,
   `issue`, etc. — e.g. `feature/jsmith-NEX-1234`. Only the ticket key
   (`NEX-[0-9]+`) is machine-enforced; the branch name must contain it.

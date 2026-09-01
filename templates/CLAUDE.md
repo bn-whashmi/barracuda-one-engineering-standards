@@ -43,6 +43,8 @@ Do not commit if any check fails.
 
 ## CI/CD
 
+- Commits: `NEX-{ticket} <imperative summary>` (e.g.
+  `NEX-6449 Rename risk record update timestamp`).
 - Branch: `{type}/{username}-NEX-{ticket}` (e.g. `feature/jsmith-NEX-1234`);
   the branch name must contain the ticket key, and the PR title must include
   NEX-xxxxx.
