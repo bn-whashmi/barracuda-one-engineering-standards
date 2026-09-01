@@ -36,12 +36,10 @@ already runs into the evidence layer, plus adding the checks no repo has.
    a pass.)
 
 3. What Week 1 actually adds:
-   - Secret detection: GitHub Secret Protection (secret scanning alerts +
-     push protection) is the authoritative control — verify it is enabled
-     under Settings → Advanced Security and turn on push protection if it
-     is not. Only add `gitleaks.yml` where platform scanning is
-     unavailable or custom internal secret patterns are needed; do not run
-     both as blocking (see Common Mistakes).
+   - Secret detection: already covered — GitHub Secret Protection is
+     enabled org-wide with validity checks, extended metadata, generic
+     patterns, and push protection. Do not add `gitleaks.yml`; just verify
+     the settings under Settings → Advanced Security on the repo.
    - `semgrep-ce.yml`, with the Barracuda rules from
      [security/semgrep/barracuda.yml](../security/semgrep/barracuda.yml)
      copied into the repo's `.guardrails/semgrep-rules.yml`.
@@ -71,11 +69,18 @@ Adopt one provider at a time (see
 
 1. GitHub profile first (no new vendor):
    `python3 tooling/install.py --target /path/to/repo --profile github`
+   Much of this is existing coverage to verify, not adopt: Secret
+   Protection (full feature set) and Dependabot alerts + dependency graph
+   are already enabled — the profile's verification checks confirm them
+   and bind the evidence. The real gap is **CodeQL** (`deep-sast`): enable
+   default setup per repo. This also activates Copilot Autofix, which is
+   already licensed and toggled on but idle until CodeQL produces alerts.
 2. SonarQube (`static-quality`) — quality gate on new code.
-3. Snyk — decide the authoritative product per finding class before enabling
-   both Open Source and Code. Today most Nexus repos run
-   `bn-vuln-hunter`; keep it supplemental once Snyk is authoritative, or
-   keep bn-vuln-hunter authoritative and skip Snyk — pick one, document it.
+3. Snyk — three scanners now overlap on dependency vulnerabilities:
+   Dependabot (already enabled), `bn-vuln-hunter` (runs in most repos),
+   and Snyk (not adopted). Pick the authoritative product per finding
+   class and document it; skipping Snyk entirely because Dependabot +
+   bn-vuln-hunter already cover the class is a legitimate outcome.
 4. FOSSA (`license-compliance`) — when an owner is assigned.
 
 **Exit criteria per provider:** reliable results on representative PRs, tuned
@@ -116,10 +121,10 @@ Found by auditing the five main backend repos — fix these during adoption:
   standardize on the version pin.
 - `actions/checkout` split across v4/v7 and `actions/setup-dotnet` across
   v4/v6 — align to the newest verified versions.
-- No repo currently runs CodeQL, SonarQube, or Snyk in CI — these are
-  Tier 2 targets, not existing coverage. GitHub secret scanning appears
-  enabled at the platform level — verify alerts + push protection per repo
-  rather than assuming coverage.
+- CodeQL needs setup on every repo — Copilot Autofix is licensed and
+  toggled on but idle until CodeQL produces alerts. SonarQube and FOSSA
+  are not adopted anywhere. (Secret Protection and Dependabot are already
+  enabled — existing coverage, not gaps.)
 - Copilot PR review runs without barracuda-context grounding or structured
   findings — reviews are generic and produce no scorecard evidence.
 
