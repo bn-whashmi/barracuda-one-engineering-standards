@@ -83,6 +83,11 @@ Focus enforcement on new and changed code. Repository baselines:
   rest is KMS-encrypted; SOPS for committed secrets.
 - Never log tokens, invite codes, session artifacts, raw customer payloads,
   or unnecessary PII.
+- Bailey (the AI assistant, served by ai-service and mcp-server) is
+  **read-only by design** — a documented customer-facing guarantee
+  ("Working with Bailey AI Assistant", Barracuda Campus). Never expose
+  write or mutation capability to the assistant; changes that do are
+  high-risk and require domain-owner review.
 - Organization Semgrep rules live in
   [security/semgrep/barracuda.yml](../security/semgrep/barracuda.yml);
   consuming repositories add them to their `.guardrails/semgrep-rules.yml`.
@@ -129,5 +134,6 @@ Focus enforcement on new and changed code. Repository baselines:
 Elevated scrutiny and domain-owner review for changes touching:
 authentication/authorization, account isolation (BCC account hierarchy),
 billing, customer data,
-deployment configuration, Kafka topics or schema registry, and GraphQL
-schema changes affecting authorization or backward compatibility.
+deployment configuration, Kafka topics or schema registry, AI assistant
+capability (Bailey is read-only by design), and GraphQL schema changes
+affecting authorization or backward compatibility.

@@ -13,6 +13,7 @@ reference them, do not fork their content into this repo.
 | AI development lifecycle | `aidlc-rules/` (v1.0.1, 32 files) | Full adaptive AI-DLC: inception/construction phases, security baselines, content validation, audit logging |
 | AI requirements checklist | [reference/ai-requirements-checklist.md](reference/ai-requirements-checklist.md) | Generic pre-generation and pre-merge questionnaire: functional, NFR, tenancy, testing, pitfalls (distilled from platform practice; feature-specific requirement docs stay in Jira) |
 | BDS conventions + skills | `nexus-ui-host/.claude/bds-guides/`, `.claude/skills/` | Design-system rules, anti-patterns, compliance-check skills, token references |
+| Customer-facing behavior guarantees | Barracuda Campus, BarracudaONE space (`documentation.campus.barracuda.com/wiki/spaces/ONE`) | Documented product behavior code must not silently change: Bailey read-only guarantee, Entra ID 12-hour sync + published identity risks, API portal scope model |
 
 ## CI/CD Assets
 

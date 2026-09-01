@@ -44,7 +44,14 @@ Security:
 - RDS via IAM tokens, S3 via IAM roles, Kafka via SASL/SSL, KMS at rest.
 - No tokens, invite codes, session artifacts, or raw customer payloads in
   logs or AI prompts.
-- FIDO MFA and Entra ID integration changes are high-risk.
+- Bailey (ai-service, mcp-server) is read-only by design — a documented
+  customer guarantee. Any change exposing write or mutation capability to
+  the assistant is P0 unless explicitly authorized.
+- FIDO MFA and Entra ID integration changes are high-risk. Entra ID
+  behavior is customer-documented: 12-hour auto sync and published
+  identity risk checks (weak/absent MFA, phishing-resistant MFA not
+  enforced, unmanaged device access, excessive global admins) — changes
+  to risk-detection logic or sync cadence are customer-visible.
 
 QA:
 - Coverage: 80% for .NET/gateway, 100% functions+lines for nexus-ui-host.
@@ -60,4 +67,5 @@ Repo standards:
 Authentication/authorization, account isolation (BCC account hierarchy),
 billing, customer data,
 deployment configuration (Terraform/Helm/ArgoCD), Kafka topics and schema
-registry, and GraphQL authorization changes.
+registry, AI assistant capability (Bailey read-only guarantee), and
+GraphQL authorization changes.
