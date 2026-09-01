@@ -7,8 +7,9 @@ against those contexts creates false confidence.
 
 Candidate rules:
 
-- Require `tenantId` or an equivalent approved tenant boundary before tenant
-  data access where SaaS tenant isolation applies.
+- Require the approved account boundary key (on Nexus: `bcc_account_id` /
+  `BccAccountId`) before customer account data access; authorization
+  follows the BCC account hierarchy.
 - Reject SQL construction from user-controlled strings; prefer parameterized
   queries or approved query builders.
 - Reject logging of authentication tokens, session credentials, and equivalent

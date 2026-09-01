@@ -24,7 +24,10 @@ reference them, do not fork their content into this repo.
 | Vulnerability scan | `barracuda-internal/bn-securedev-cicd/actions/bn-vuln-hunter` | Pin `@v2`, not `@main` |
 | TFLint config | [templates/tflint.hcl](../templates/tflint.hcl) (from `nexus-terraform/.tflint.hcl`) | Typed variables, documented outputs, naming convention, AWS plugin |
 | Terraform plan/apply flow | `nexus-terraform/.github/workflows/` | Plan-with-PR-comment, manual apply gates, OIDC auth, concurrency control |
-| GitOps structure | `nexus-argocd` (base/overlays), `nexus-charts` | Deployment order documented in charts README; promotion flow dev→qa→prod is implicit — a documentation gap |
+| GitOps structure | `nexus-argocd` (base/overlays), `nexus-charts` | Deployment order documented in charts README; promotion via PRs to per-environment `versions/` files |
+| Helm chart gates | `nexus-charts/.github/workflows/` | `helm lint` + rendered chart-diff PR comments; shared `nexus-app-generic` base chart; Renovate for chart versions |
+| Kustomize/K8s lint | `nexus-argocd/argocd-lint/` | Custom Checkov checks + `kubectl kustomize` build validation |
+| Kafka schema CI | `nexus-schemas` | Topic JSON Schemas validated and registered to Confluent Schema Registry on merge |
 | PR template with AI testing notes | `nexus-ui-host/.github/PULL_REQUEST_TEMPLATE.md` | Auto-generated AI testing notes on merge, opt-out checkbox |
 | Role-based e2e auth | `nexus-ui-host/e2e/playwright.config.ts` | Per-role auth setup projects with dependency chaining |
 | License compliance precedent | `bds/THIRD_PARTY_LICENSES.md`, `bds/RESOLUTIONS.md` | Owner, key storage, renewal cycle; documented dependency resolutions with exit criteria |
@@ -37,3 +40,9 @@ reference them, do not fork their content into this repo.
 - Commit message format beyond the Jira ticket reference.
 - Org-wide action version matrix (checkout/setup-dotnet currently
   inconsistent across repos).
+- .NET version drift: account-service is still on .NET 8 while the rest of
+  the backend fleet is on .NET 10; account-service also lacks a `CLAUDE.md`.
+- AGENTS.md adoption: only ai-service has one; the other backend repos rely
+  on `CLAUDE.md` alone.
+- No repository has a `.guardrails/` install yet — Guardrails adoption has
+  not started on the Nexus fleet.

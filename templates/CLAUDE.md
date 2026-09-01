@@ -43,13 +43,16 @@ Do not commit if any check fails.
 
 ## CI/CD
 
-- Branch: `{type}/NEX-{ticket}` (e.g. `feature/NEX-1234`, `issue/NEX-1234`);
-  PR title must include NEX-xxxxx.
+- Branch: `{type}/{username}-NEX-{ticket}` (e.g. `feature/jsmith-NEX-1234`);
+  the branch name must contain the ticket key, and the PR title must include
+  NEX-xxxxx.
 - GitHub Actions with `barracuda-internal/nexus-actions@v2`; ArgoCD GitOps.
 - Jira transitions are automated on PR open and merge.
 
 ## Security
 
-- Tenant isolation: scope every tenant-data query by tenantId.
+- Account scoping: scope every account-data query by `bcc_account_id`
+  (`BccAccountId`); authorization follows the BCC account hierarchy
+  (MSP partner → managed customer accounts).
 - Never commit or log secrets, tokens, customer data, or PII.
 - IAM auth for RDS/S3; SASL/SSL for Kafka; KMS at rest.

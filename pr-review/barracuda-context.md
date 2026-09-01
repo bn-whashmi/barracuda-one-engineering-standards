@@ -28,7 +28,19 @@ Engineering:
 - GraphQL schema changes preserve backward compatibility unless authorized.
 
 Security:
-- Every tenant-scoped query filters by `tenantId`; cross-tenant access is P0.
+- Every data query scopes by `bcc_account_id` (`BccAccountId` in C#) — the
+  BCC (Barracuda Cloud Control) account ID identifying a company. Unscoped
+  queries, or access to an account outside the caller's authorized BCC
+  account hierarchy, are P0. Hierarchy traversal by MSP users over their
+  managed customer accounts is legitimate by design — do not flag it.
+  Kafka messages partition by `bcc_account_id`; account-service resolves
+  the hierarchy and the mesh gateway validates the requested account
+  against it (short-TTL Redis cache) before routing — backend services
+  must still never run an unscoped account-data query.
+- Three auth boundaries: BCC IDP OIDC for browser traffic through the mesh
+  gateway; Auth0 client-credentials JWT at kafka-rest-api for partner
+  telemetry; Auth0 via API Gateway + WAF + Lambda authorizer for public API
+  consumers. Changes on any of the three are high-risk.
 - RDS via IAM tokens, S3 via IAM roles, Kafka via SASL/SSL, KMS at rest.
 - No tokens, invite codes, session artifacts, or raw customer payloads in
   logs or AI prompts.
@@ -45,6 +57,7 @@ Repo standards:
 
 ## High-Risk Surfaces (Escalate to Domain Owner)
 
-Authentication/authorization, tenant isolation, billing, customer data,
+Authentication/authorization, account isolation (BCC account hierarchy),
+billing, customer data,
 deployment configuration (Terraform/Helm/ArgoCD), Kafka topics and schema
 registry, and GraphQL authorization changes.

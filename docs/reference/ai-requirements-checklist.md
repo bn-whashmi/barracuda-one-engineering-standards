@@ -32,9 +32,12 @@ Jira or the owning repository, never here.
 
 - How is the endpoint authenticated and authorized (gateway-delegated JWT vs
   direct validation)?
-- Is every tenant-scoped query filtered by `tenantId`?
-- For MSP scenarios: what is aggregated across tenants vs per-tenant, and
-  what happens when a customer is removed from MSP management?
+- Is every account-scoped query filtered by `bcc_account_id`
+  (`BccAccountId`), and is access authorized against the caller's BCC
+  account hierarchy?
+- For MSP scenarios: what is aggregated across managed customer accounts vs
+  per-account, and what happens when a customer is removed from MSP
+  management?
 - Any input that reaches SQL, shell, or a template — is it parameterized?
 
 ## Frontend
