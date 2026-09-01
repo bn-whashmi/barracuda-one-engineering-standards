@@ -35,8 +35,13 @@ already runs into the evidence layer, plus adding the checks no repo has.
    variables instead — an unset command skips the producer; it cannot fake
    a pass.)
 
-3. What Week 1 actually adds — no Nexus repo has these today:
-   - `gitleaks.yml` — secret detection.
+3. What Week 1 actually adds:
+   - Secret detection: GitHub Secret Protection (secret scanning alerts +
+     push protection) is the authoritative control — verify it is enabled
+     under Settings → Advanced Security and turn on push protection if it
+     is not. Only add `gitleaks.yml` where platform scanning is
+     unavailable or custom internal secret patterns are needed; do not run
+     both as blocking (see Common Mistakes).
    - `semgrep-ce.yml`, with the Barracuda rules from
      [security/semgrep/barracuda.yml](../security/semgrep/barracuda.yml)
      copied into the repo's `.guardrails/semgrep-rules.yml`.
@@ -111,8 +116,10 @@ Found by auditing the five main backend repos — fix these during adoption:
   standardize on the version pin.
 - `actions/checkout` split across v4/v7 and `actions/setup-dotnet` across
   v4/v6 — align to the newest verified versions.
-- No repo currently runs CodeQL, SonarQube, Snyk, or secret-detection —
-  these are Tier 2 targets, not existing coverage.
+- No repo currently runs CodeQL, SonarQube, or Snyk in CI — these are
+  Tier 2 targets, not existing coverage. GitHub secret scanning appears
+  enabled at the platform level — verify alerts + push protection per repo
+  rather than assuming coverage.
 - Copilot PR review runs without barracuda-context grounding or structured
   findings — reviews are generic and produce no scorecard evidence.
 
