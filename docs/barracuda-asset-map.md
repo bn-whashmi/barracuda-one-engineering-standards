@@ -14,6 +14,10 @@ reference them, do not fork their content into this repo.
 | AI requirements checklist | [reference/ai-requirements-checklist.md](reference/ai-requirements-checklist.md) | Generic pre-generation and pre-merge questionnaire: functional, NFR, tenancy, testing, pitfalls (distilled from platform practice; feature-specific requirement docs stay in Jira) |
 | BDS conventions + skills | `nexus-ui-host/.claude/bds-guides/`, `.claude/skills/` | Design-system rules, anti-patterns, compliance-check skills, token references |
 | Customer-facing behavior guarantees | Barracuda Campus, BarracudaONE space (`documentation.campus.barracuda.com/wiki/spaces/ONE`) | Documented product behavior code must not silently change: Bailey read-only guarantee, Entra ID 12-hour sync + published identity risks, API portal scope model |
+| New service scaffold | `nexus-service-template` (GitHub template repo) | Pre-wired .NET service: CI (build/test/coverage, PR validator, Jira automation), Dockerfile, OpenTelemetry/Serilog/Prometheus, health endpoints, opt-in HotChocolate + EF Core/IAM examples |
+| Product API onboarding runbook | `nexus-architecture/docs/onboarding-product-api.md` | Slug/base-path/`read:{slug}` scope conventions, gateway-proves-identity vs backend-proves-authorization trust split, OpenAPI publication to shared CDN |
+| Platform API E2E tests | `nexus-playwright` | Live dev/QA GraphQL + REST test suites with DB-seeding factories and auto-cleanup; runs in CI via the `run-b1-tests` Docker image |
+| Agent workflow skills | `nexus-architecture/.claude/skills/` | Jira ticket lifecycle (create/complete/verify), doc-sync CI, and repo-audit skills |
 
 ## CI/CD Assets
 
@@ -47,3 +51,8 @@ reference them, do not fork their content into this repo.
   on `CLAUDE.md` alone.
 - No repository has a `.guardrails/` install yet — Guardrails adoption has
   not started on the Nexus fleet.
+- `nexus-service-template` is on .NET 8 while the fleet standard is .NET 10
+  — new services start behind until the template is upgraded.
+- Convention adherence baseline (NEX-4157, 2026-05): audited repos scored
+  46–82/100 against the C# conventions — see
+  `nexus-architecture/repo-auditing/` for the scored findings.

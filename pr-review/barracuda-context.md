@@ -57,6 +57,9 @@ QA:
 - Coverage: 80% for .NET/gateway, 100% functions+lines for nexus-ui-host.
 - Fail-open paths need both cache-hit and cache-miss tests.
 - Frontend tests colocated in `unit-tests/` directories.
+- Backend API changes: platform-level API E2E tests live in
+  `nexus-playwright` (live dev/QA GraphQL + REST suites with DB-seeding
+  factories). Flag new or changed endpoints with no coverage there.
 
 Repo standards:
 - Canonical ground truth: `nexus-architecture/standards/` and each repo's

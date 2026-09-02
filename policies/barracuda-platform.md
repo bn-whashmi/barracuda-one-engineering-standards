@@ -16,6 +16,8 @@ Do not duplicate these — they are the source of truth:
 | AI development lifecycle process | `aidlc-rules/` (v1.0.1) |
 | Shared CI actions | `barracuda-internal/nexus-actions@v2` |
 | Kafka topic JSON Schemas | `nexus-schemas` (registered to Schema Registry on merge) |
+| New service scaffold | `nexus-service-template` (GitHub template repo) |
+| Public product API onboarding | `nexus-architecture/docs/onboarding-product-api.md` |
 | Frontend design system rules | `nexus-ui-host/.claude/bds-guides/` and BDS skills |
 
 See [docs/barracuda-asset-map.md](../docs/barracuda-asset-map.md) for the full
@@ -83,8 +85,14 @@ Focus enforcement on new and changed code. Repository baselines:
     exposed directly to the internet must perform full validation.
   - Partner telemetry producers: Auth0 client-credentials JWT, validated by
     kafka-rest-api.
-  - Public API consumers: Auth0 JWT via AWS API Gateway + WAF with a Lambda
-    authorizer (scope and account-hierarchy checks).
+  - Public API consumers: Auth0 JWT via AWS API Gateway + WAF. The
+    gateway's Lambda authorizer only proves identity (signature validity
+    and expiry) — the product backend must enforce the OAuth2 scope
+    (`read:{slug}`, e.g. `read:barracuda_one`) and application-level
+    authorization (account hierarchy, RBAC). A backend that skips scope
+    checking is vulnerable even behind the gateway. New product APIs
+    follow the onboarding runbook
+    (`nexus-architecture/docs/onboarding-product-api.md`).
 - RDS uses IAM token auth; S3 uses IAM roles; Kafka uses SASL/SSL; data at
   rest is KMS-encrypted; SOPS for committed secrets.
 - Never log tokens, invite codes, session artifacts, raw customer payloads,
@@ -105,6 +113,18 @@ Focus enforcement on new and changed code. Repository baselines:
 - Use `useTokens()` / BDS tokens for styling; never hardcode colors/spacing.
 - Sentence case for all UI text.
 - TanStack React Query for server state.
+
+## New Services
+
+- New backend services start from the `nexus-service-template` GitHub
+  template ("Use this template") — CI (build, tests, coverage, PR
+  validation, Jira automation), Dockerfile, OpenTelemetry/Serilog/
+  Prometheus, and health endpoints come pre-wired. Do not scaffold
+  services by hand.
+- New public product APIs follow
+  `nexus-architecture/docs/onboarding-product-api.md`: product slug,
+  API Gateway base path = slug, OAuth2 scope `read:{slug}`, OpenAPI spec
+  published to the shared CDN.
 
 ## Kafka and Schemas
 
