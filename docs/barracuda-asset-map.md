@@ -36,6 +36,7 @@ reference them, do not fork their content into this repo.
 | PR template with AI testing notes | `nexus-ui-host/.github/PULL_REQUEST_TEMPLATE.md` | Auto-generated AI testing notes on merge, opt-out checkbox |
 | Role-based e2e auth | `nexus-ui-host/e2e/playwright.config.ts` | Per-role auth setup projects with dependency chaining |
 | License compliance precedent | `bds/THIRD_PARTY_LICENSES.md`, `bds/RESOLUTIONS.md` | Owner, key storage, renewal cycle; documented dependency resolutions with exit criteria |
+| FOSSA platform integration | app.fossa.com (org GitHub integration) | License + security status per repo (badges in e.g. product-state-service README); scans platform-side, not yet a PR gate |
 
 ## Documented Gaps (candidates for future standards work)
 

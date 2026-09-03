@@ -76,12 +76,17 @@ Adopt one provider at a time (see
    default setup per repo. This also activates Copilot Autofix, which is
    already licensed and toggled on but idle until CodeQL produces alerts.
 2. SonarQube (`static-quality`) — quality gate on new code.
-3. Snyk — three scanners now overlap on dependency vulnerabilities:
+3. Snyk — four scanners can overlap on dependency vulnerabilities:
    Dependabot (already enabled), `bn-vuln-hunter` (runs in most repos),
-   and Snyk (not adopted). Pick the authoritative product per finding
-   class and document it; skipping Snyk entirely because Dependabot +
-   bn-vuln-hunter already cover the class is a legitimate outcome.
-4. FOSSA (`license-compliance`) — when an owner is assigned.
+   FOSSA security scanning (platform integration), and Snyk (not
+   adopted). Pick the authoritative product per finding class and
+   document it; skipping Snyk entirely because the others already cover
+   the class is a legitimate outcome.
+4. FOSSA (`license-compliance`) — already integrated at the platform
+   level (app.fossa.com org GitHub integration; license + security
+   status per repo). Existing coverage to verify, not new adoption — the
+   remaining work is binding its result into the scorecard and, once
+   reliable, the repo ruleset.
 
 **Exit criteria per provider:** reliable results on representative PRs, tuned
 thresholds, named owner. Only then require its exact status context.
@@ -122,9 +127,10 @@ Found by auditing the five main backend repos — fix these during adoption:
 - `actions/checkout` split across v4/v7 and `actions/setup-dotnet` across
   v4/v6 — align to the newest verified versions.
 - CodeQL needs setup on every repo — Copilot Autofix is licensed and
-  toggled on but idle until CodeQL produces alerts. SonarQube and FOSSA
-  are not adopted anywhere. (Secret Protection and Dependabot are already
-  enabled — existing coverage, not gaps.)
+  toggled on but idle until CodeQL produces alerts. SonarQube is not
+  adopted anywhere. (Secret Protection, Dependabot, and FOSSA are already
+  enabled — existing coverage, not gaps; FOSSA runs platform-side and is
+  not yet a PR gate.)
 - Copilot PR review runs without barracuda-context grounding or structured
   findings — reviews are generic and produce no scorecard evidence.
 
