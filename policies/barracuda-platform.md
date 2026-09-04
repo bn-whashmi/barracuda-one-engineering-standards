@@ -93,6 +93,11 @@ Focus enforcement on new and changed code. Repository baselines:
     checking is vulnerable even behind the gateway. New product APIs
     follow the onboarding runbook
     (`nexus-architecture/docs/onboarding-product-api.md`).
+- Dependency hygiene is required on every repo: Dependabot alerts and
+  security updates enabled (org default — verify per repo, don't assume),
+  plus a `.github/dependabot.yml` for version updates (weekly cadence, as
+  scaffolded by nexus-service-template). `bn-vuln-hunter` and FOSSA
+  provide the scanning layers on top.
 - RDS uses IAM token auth; S3 uses IAM roles; Kafka uses SASL/SSL; data at
   rest is KMS-encrypted; SOPS for committed secrets.
 - Never log tokens, invite codes, session artifacts, raw customer payloads,
