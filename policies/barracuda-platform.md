@@ -102,9 +102,13 @@ Focus enforcement on new and changed code. Repository baselines:
   ("Working with Bailey AI Assistant", Barracuda Campus). Never expose
   write or mutation capability to the assistant; changes that do are
   high-risk and require domain-owner review.
-- Organization Semgrep rules live in
+- Organization static rules are enforced through the linters repos already
+  run: ESLint `no-restricted-imports` for the `@mui/material` ban
+  (frontend); Roslyn analyzer / banned-API configuration for
+  TLS-validation-disable, SQL string construction, and token logging
+  (.NET). The rule catalog is documented in
   [security/semgrep/barracuda.yml](../security/semgrep/barracuda.yml);
-  consuming repositories add them to their `.guardrails/semgrep-rules.yml`.
+  the Semgrep runner is not part of Nexus adoption.
 
 ## Frontend (BDS)
 

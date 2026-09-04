@@ -40,9 +40,12 @@ already runs into the evidence layer, plus adding the checks no repo has.
      enabled org-wide with validity checks, extended metadata, generic
      patterns, and push protection. Do not add `gitleaks.yml`; just verify
      the settings under Settings → Advanced Security on the repo.
-   - `semgrep-ce.yml`, with the Barracuda rules from
-     [security/semgrep/barracuda.yml](../security/semgrep/barracuda.yml)
-     copied into the repo's `.guardrails/semgrep-rules.yml`.
+   - Organization static rules, enforced through the linters the repo
+     already runs — no Semgrep needed: the `@mui/material` import ban via
+     ESLint `no-restricted-imports` (frontend); TLS-validation-disable,
+     SQL string construction, and token logging via Roslyn analyzer /
+     banned-API configuration (.NET). The rule catalog is documented in
+     [security/semgrep/barracuda.yml](../security/semgrep/barracuda.yml).
    - `repository-validation.yml` — repo, docs, ground-truth, and
      change-scope validators.
    - `guardrails-scorecard.yml` — evidence collection and the PR scorecard
@@ -75,18 +78,22 @@ Adopt one provider at a time (see
    and bind the evidence. The real gap is **CodeQL** (`deep-sast`): enable
    default setup per repo. This also activates Copilot Autofix, which is
    already licensed and toggled on but idle until CodeQL produces alerts.
-2. SonarQube (`static-quality`) — quality gate on new code.
-3. Snyk — four scanners can overlap on dependency vulnerabilities:
-   Dependabot (already enabled), `bn-vuln-hunter` (runs in most repos),
-   FOSSA security scanning (platform integration), and Snyk (not
-   adopted). Pick the authoritative product per finding class and
-   document it; skipping Snyk entirely because the others already cover
-   the class is a legitimate outcome.
-4. FOSSA (`license-compliance`) — already integrated at the platform
+2. FOSSA (`license-compliance`) — already integrated at the platform
    level (app.fossa.com org GitHub integration; license + security
    status per repo). Existing coverage to verify, not new adoption — the
    remaining work is binding its result into the scorecard and, once
    reliable, the repo ruleset.
+
+**Deliberately not adopted** (covered by the existing stack — revisit only
+on a concrete need):
+
+- Snyk — dependency vulnerabilities are covered three ways already:
+  Dependabot, `bn-vuln-hunter`, and FOSSA security scanning.
+- SonarQube — its quality-gate territory is covered by the
+  `CODE_COVERAGE_TARGET` gate, existing linters and analyzers, and
+  grounded Copilot review.
+- Semgrep — its org rules are enforced through existing linters (see
+  Week 1); the runner adds a tool without adding coverage.
 
 **Exit criteria per provider:** reliable results on representative PRs, tuned
 thresholds, named owner. Only then require its exact status context.
@@ -106,7 +113,7 @@ what already runs, not adding AI review from scratch:
    hierarchy authorization model.
 2. Decide the authoritative Tier 3 provider and document it — Copilot
    grounded with the lens prompts, or a separate adapter wired through the
-   AI review workflows (same pick-one rule as bn-vuln-hunter vs Snyk).
+   AI review workflows (pick one authoritative provider, document it).
    Structured JSON findings, P0–P3 severities, and scorecard evidence
    require the adapter route; grounded Copilot alone stays advisory
    commentary.
@@ -127,10 +134,10 @@ Found by auditing the five main backend repos — fix these during adoption:
 - `actions/checkout` split across v4/v7 and `actions/setup-dotnet` across
   v4/v6 — align to the newest verified versions.
 - CodeQL needs setup on every repo — Copilot Autofix is licensed and
-  toggled on but idle until CodeQL produces alerts. SonarQube is not
-  adopted anywhere. (Secret Protection, Dependabot, and FOSSA are already
-  enabled — existing coverage, not gaps; FOSSA runs platform-side and is
-  not yet a PR gate.)
+  toggled on but idle until CodeQL produces alerts. (Secret Protection,
+  Dependabot, and FOSSA are already enabled — existing coverage, not
+  gaps; FOSSA runs platform-side and is not yet a PR gate. SonarQube,
+  Snyk, and Semgrep are deliberately not adopted — see Tier 2.)
 - Copilot PR review runs without barracuda-context grounding or structured
   findings — reviews are generic and produce no scorecard evidence.
 

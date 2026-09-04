@@ -27,20 +27,20 @@ plus external vendors; Tier 3 is the four AI reviews.
 | `build` | `dotnet build` / `yarn build` / `terraform validate` |
 | `unit-tests` | xUnit / Jest (see coverage targets in [barracuda-platform.md](../policies/barracuda-platform.md)) |
 | `changed-code-coverage` | Coverlet / Jest coverage |
-| `custom-static-analysis` | Semgrep CE with repo-owned rules + [barracuda.yml](../security/semgrep/barracuda.yml) |
+| `custom-static-analysis` | Existing linters — ESLint `no-restricted-imports` (frontend), Roslyn analyzers / banned APIs (.NET); rule catalog in [barracuda.yml](../security/semgrep/barracuda.yml) (Semgrep runner not adopted) |
 | `secret-detection` | Gitleaks CLI |
 
 ### Tier 2 — 3rd Party
 
 | Control | Barracuda producer / provider |
 | --- | --- |
-| `deep-sast` | CodeQL (GitHub profile) or Snyk Code |
+| `deep-sast` | CodeQL (GitHub profile; also activates licensed Copilot Autofix) |
 | `dependency-change-review` | GitHub Dependency Review |
 | `platform-secret-protection` | GitHub Secret Protection |
 | `dependency-remediation` | Dependabot |
 | `artifact-provenance` | GitHub Artifact Attestations |
-| `static-quality` | SonarQube / SonarCloud |
-| `dependency-vulnerability` | Snyk Open Source; today: `bn-securedev-cicd/bn-vuln-hunter` |
+| `static-quality` | Not adopted — covered by coverage gate + linters + grounded Copilot review (SonarQube only on concrete need) |
+| `dependency-vulnerability` | Dependabot + `bn-securedev-cicd/bn-vuln-hunter` + FOSSA security (Snyk not adopted) |
 | `license-compliance` | FOSSA (BDS MUI X licensing precedent in `bds/THIRD_PARTY_LICENSES.md`) |
 | `runtime-soak`, `container-vulnerability`, `iac-misconfiguration`, `artifact-sbom`, `artifact-vulnerability`, `deployment-policy`, `dynamic-application-security`, `runtime-assurance` | Evidence-only or environment-based; adopt per repo |
 
