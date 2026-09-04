@@ -38,6 +38,35 @@ reference them, do not fork their content into this repo.
 | License compliance precedent | `bds/THIRD_PARTY_LICENSES.md`, `bds/RESOLUTIONS.md` | Owner, key storage, renewal cycle; documented dependency resolutions with exit criteria |
 | FOSSA platform integration | app.fossa.com (org GitHub integration) | License + security status per repo (badges in e.g. product-state-service README); scans platform-side, not yet a PR gate |
 
+## Existing AI Automation (Claude API, provisioned fleet-wide)
+
+`ANTHROPIC_API_KEY` / `ANTHROPIC_BASE_URL` repo secrets power production CI
+automation today (23 workflow references):
+
+- `update-docs.yml` in every backend repo — headless Claude doc sync
+- `build-and-deploy` — AI-generated testing notes on merge
+- `nexus-architecture` — bi-weekly root architecture verification and Jira
+  ticket transitions
+
+Copilot reviews PRs; Claude maintains docs and automates tickets. A Tier 3
+structured-review adapter would share these already-provisioned credentials.
+
+## Shared CI Credentials (referenced across fleet workflows)
+
+| Secret | Purpose |
+| --- | --- |
+| `NEXUS_GH_APP_CLIENT_ID` / `NEXUS_GH_APP_PRIVATE_KEY`, `NEXUS_APP_ID` / `NEXUS_APP_PRIVATE_KEY` | Nexus GitHub App — mints scoped tokens for CI (the workhorse; 130+ references) |
+| `JIRA_API_TOKEN` / `JIRA_USER_EMAIL` | Jira ticket automation |
+| `ANTHROPIC_API_KEY` / `ANTHROPIC_BASE_URL` | Claude API — doc sync, testing notes, ticket automation |
+| `BNSEC_SECUREDEV_IQ_API_KEY` / `PLATFORM_CI_IQ_KEY` | bn-vuln-hunter scanning |
+| `FOSSA_API_KEY` | FOSSA CI scans |
+| `CUDA_NETWORKS_GITHUB_AUTH_TOKEN` | Cross-org GitHub access |
+| `GIST_AUTH_TOKEN` | Coverage badge gists |
+| `DATABRICKS_TOKEN` / `DATABRICKS_HOST` | api-service value-report resync |
+| `AZURE_CREDENTIALS` | Azure operations (Entra ID) |
+| `ARTIFACTORY_USER` / `ARTIFACTORY_PASSWORD` | Artifactory (static — see gaps; OIDC preferred) |
+| `AWS_RDS_USERNAME` / `AWS_RDS_PASSWORD` | Deploy-time database migrations (nexus-argocd) |
+
 ## Documented Gaps (candidates for future standards work)
 
 - Environment promotion flow (dev → qa → prod) exists in practice but is not
@@ -57,3 +86,11 @@ reference them, do not fork their content into this repo.
 - Convention adherence baseline (NEX-4157, 2026-05): audited repos scored
   46–82/100 against the C# conventions — see
   `nexus-architecture/repo-auditing/` for the scored findings.
+- Credential hygiene (found by sweeping `secrets.*` across fleet
+  workflows): static `AWS_RDS_USERNAME`/`AWS_RDS_PASSWORD` in
+  nexus-argocd database-deploy workflows (runtime uses IAM; deploy-time
+  does not); static `ARTIFACTORY_USER`/`PASSWORD` in some repos while
+  others use Artifactory OIDC; a stray `GH_PAT` where the GitHub App
+  should be used; naming drift (`JIRA_TOKEN` vs `JIRA_API_TOKEN`,
+  lowercase `secrets_app_id`); unexplained `SES_K` in nexus-terraform
+  workflows — audit and standardize.

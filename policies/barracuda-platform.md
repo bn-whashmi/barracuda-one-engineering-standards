@@ -103,8 +103,10 @@ Focus enforcement on new and changed code. Repository baselines:
   repo has a FOSSA project, don't assume. License policy violations are
   resolved or explicitly documented with exit criteria (precedent:
   `bds/RESOLUTIONS.md`).
-- RDS uses IAM token auth; S3 uses IAM roles; Kafka uses SASL/SSL; data at
-  rest is KMS-encrypted; SOPS for committed secrets.
+- RDS: runtime services authenticate with IAM tokens; deploy-time database
+  migrations (nexus-argocd) use master credentials from CI secrets. S3 uses
+  IAM roles; Kafka uses SASL/SSL; data at rest is KMS-encrypted; SOPS for
+  committed secrets.
 - Never log tokens, invite codes, session artifacts, raw customer payloads,
   or unnecessary PII.
 - Bailey (the AI assistant, served by ai-service and mcp-server) is

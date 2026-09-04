@@ -120,7 +120,9 @@ what already runs, not adding AI review from scratch:
    AI review workflows (pick one authoritative provider, document it).
    Structured JSON findings, P0–P3 severities, and scorecard evidence
    require the adapter route; grounded Copilot alone stays advisory
-   commentary.
+   commentary. The adapter needs no new credentials —
+   `ANTHROPIC_API_KEY`/`ANTHROPIC_BASE_URL` are already provisioned
+   fleet-wide and power doc-sync and testing-notes automation today.
 3. Start with the engineering lens only; verify findings are material over
    ~10 PRs. Expand to QA, security, and repo-standards lenses one at a
    time.
