@@ -109,9 +109,11 @@ incumbent Tier 3 producer. Today it reviews without platform context and
 without structured findings, so adoption means grounding and structuring
 what already runs, not adding AI review from scratch:
 
-1. Ground Copilot with platform context: feed
-   [pr-review/barracuda-context.md](../pr-review/barracuda-context.md) and
-   the lens guides via the repo's `.github/copilot-instructions.md`, so it
+1. Ground Copilot with platform context: copy
+   [templates/copilot-instructions.md](../templates/copilot-instructions.md)
+   (master copy, distilled from
+   [pr-review/barracuda-context.md](../pr-review/barracuda-context.md))
+   into the repo's `.github/copilot-instructions.md`, so it
    stops flagging intentional platform patterns (fail-open Redis, error
    masking, gateway-delegated JWT validation) and knows the account-
    hierarchy authorization model.
@@ -122,7 +124,11 @@ what already runs, not adding AI review from scratch:
    require the adapter route; grounded Copilot alone stays advisory
    commentary. The adapter needs no new credentials —
    `ANTHROPIC_API_KEY`/`ANTHROPIC_BASE_URL` are already provisioned
-   fleet-wide and power doc-sync and testing-notes automation today.
+   fleet-wide and power doc-sync and testing-notes automation today. A
+   working Claude adapter ships in
+   [examples/ai-review-adapter-claude/](../examples/ai-review-adapter-claude/)
+   (contract: [ai-review-adapter-setup.md](ai-review-adapter-setup.md));
+   enable it by setting the `AI_REVIEW_COMMAND` repository variable.
 3. Start with the engineering lens only; verify findings are material over
    ~10 PRs. Expand to QA, security, and repo-standards lenses one at a
    time.

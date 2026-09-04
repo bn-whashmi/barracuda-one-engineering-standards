@@ -10,6 +10,7 @@ permissions:
   actions: read
   contents: read
   checks: read
+  pull-requests: write
 
 jobs:
   scorecard:
@@ -120,6 +121,29 @@ jobs:
             exit "${json_status}"
           fi
           exit "${markdown_status}"
+      - name: Comment scorecard on pull request
+        if: ${{ always() && github.event_name == 'pull_request_target' }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+        run: |
+          set -euo pipefail
+          SCORECARD_MARKDOWN=".artifacts/guardrails/scorecard-${GUARDRAILS_TIMESTAMP:-missing}.md"
+          if [ ! -s "${SCORECARD_MARKDOWN}" ]; then
+            echo "No scorecard markdown produced; skipping PR comment."
+            exit 0
+          fi
+          marker='<!-- guardrails-scorecard -->'
+          { echo "${marker}"; echo; cat "${SCORECARD_MARKDOWN}"; } > "${RUNNER_TEMP}/scorecard-comment.md"
+          comment_id="$(gh api "repos/${GITHUB_REPOSITORY}/issues/${PR_NUMBER}/comments" --paginate \
+            --jq "[.[] | select(.body | startswith(\"${marker}\"))][0].id // empty")"
+          if [ -n "${comment_id}" ]; then
+            gh api --method PATCH "repos/${GITHUB_REPOSITORY}/issues/comments/${comment_id}" \
+              -F "body=@${RUNNER_TEMP}/scorecard-comment.md" > /dev/null
+          else
+            gh api --method POST "repos/${GITHUB_REPOSITORY}/issues/${PR_NUMBER}/comments" \
+              -F "body=@${RUNNER_TEMP}/scorecard-comment.md" > /dev/null
+          fi
       - name: Upload scorecard evidence
         if: always()
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a

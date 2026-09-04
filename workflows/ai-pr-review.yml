@@ -26,6 +26,9 @@ jobs:
     runs-on: ubuntu-latest
     env:
       AI_REVIEW_ROLE: engineering
+      ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+      ANTHROPIC_BASE_URL: ${{ secrets.ANTHROPIC_BASE_URL }}
+      GH_TOKEN: ${{ github.token }}
       AI_REVIEW_COMMAND: ${{ inputs.review-command || vars.AI_REVIEW_COMMAND }}
       AI_REVIEW_RESULT: .ai-review/results/engineering.json
       AI_REVIEW_WORKING_DIRECTORY: ${{ inputs.review-working-directory || vars.AI_REVIEW_WORKING_DIRECTORY || '.' }}
@@ -61,6 +64,9 @@ jobs:
     runs-on: ubuntu-latest
     env:
       AI_REVIEW_ROLE: qa
+      ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+      ANTHROPIC_BASE_URL: ${{ secrets.ANTHROPIC_BASE_URL }}
+      GH_TOKEN: ${{ github.token }}
       AI_REVIEW_COMMAND: ${{ inputs.review-command || vars.AI_REVIEW_COMMAND }}
       AI_REVIEW_RESULT: .ai-review/results/qa.json
       AI_REVIEW_WORKING_DIRECTORY: ${{ inputs.review-working-directory || vars.AI_REVIEW_WORKING_DIRECTORY || '.' }}
@@ -96,6 +102,9 @@ jobs:
     runs-on: ubuntu-latest
     env:
       AI_REVIEW_ROLE: security
+      ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+      ANTHROPIC_BASE_URL: ${{ secrets.ANTHROPIC_BASE_URL }}
+      GH_TOKEN: ${{ github.token }}
       AI_REVIEW_COMMAND: ${{ inputs.review-command || vars.AI_REVIEW_COMMAND }}
       AI_REVIEW_RESULT: .ai-review/results/security.json
       AI_REVIEW_WORKING_DIRECTORY: ${{ inputs.review-working-directory || vars.AI_REVIEW_WORKING_DIRECTORY || '.' }}
@@ -131,6 +140,9 @@ jobs:
     runs-on: ubuntu-latest
     env:
       AI_REVIEW_ROLE: repo-standards
+      ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+      ANTHROPIC_BASE_URL: ${{ secrets.ANTHROPIC_BASE_URL }}
+      GH_TOKEN: ${{ github.token }}
       AI_REVIEW_COMMAND: ${{ inputs.review-command || vars.AI_REVIEW_COMMAND }}
       AI_REVIEW_RESULT: .ai-review/results/repo-standards.json
       AI_REVIEW_WORKING_DIRECTORY: ${{ inputs.review-working-directory || vars.AI_REVIEW_WORKING_DIRECTORY || '.' }}
@@ -215,5 +227,8 @@ jobs:
           if-no-files-found: warn
 
 # This workflow defines the provider-neutral contract. The consuming repository
-# supplies a trusted adapter command; no AI provider or API credential is
-# hardcoded here.
+# supplies a trusted adapter command; no AI provider is hardcoded here.
+# Credentials are passed through from repository secrets by name only —
+# adapters that use a different provider simply ignore the Anthropic vars.
+# Reference adapter: examples/ai-review-adapter-claude/ (see
+# docs/ai-review-adapter-setup.md for the contract).
