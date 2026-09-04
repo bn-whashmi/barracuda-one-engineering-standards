@@ -41,8 +41,9 @@ These are candidate rules for Semgrep or equivalent enforcement. They are
 intentionally documented in [security/semgrep/README.md](../security/semgrep/README.md)
 rather than represented by unreliable pattern-only rules.
 
-- Never access tenant data without `tenantId` where SaaS tenant isolation
-  applies.
+- Never run an unscoped query against customer account data; scope by the
+  approved account boundary key (on Nexus: `bcc_account_id`, authorized via
+  the BCC account hierarchy).
 - Never construct SQL from user-controlled strings.
 - Never log authentication tokens.
 - Never disable TLS validation.

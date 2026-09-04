@@ -22,6 +22,10 @@ ground truth.
 ## Change contract
 
 - Use a pull request for every normal change to the default branch.
+- Commit messages follow the Nexus convention this repo prescribes:
+  `NEX-{ticket} <imperative summary>` (see
+  [policies/barracuda-platform.md](policies/barracuda-platform.md)) — this
+  repo eats its own dog food.
 - No approving review is required for a solo maintainer unless the repository
   ruleset is intentionally strengthened.
 - Keep controls advisory until their producer, evidence, status-check name,

@@ -32,20 +32,21 @@ List the narrowest useful checks first.
 
 ## Commit Standard
 
-Use concise, auditable commit messages:
+Use concise, auditable commit messages starting with the Jira ticket:
 
 ```text
-<type>: <imperative summary>
+NEX-{ticket} <imperative summary>
 ```
 
 Examples:
 
 ```text
-fix: preserve document ownership on admin edits
-feat: add tenant-level billing controls
-chore: mark repo private
-docs: document deployment rollback path
+NEX-6449 Rename risk record update timestamp
+NEX-6028 Aggregate distinct risk counts in SQL instead of in-memory
+NEX-6568 Fix 404 page
 ```
+
+Jira automation extracts the ticket from the message via `NEX-[0-9]+`.
 
 ## Agent Rules
 

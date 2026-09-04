@@ -1,0 +1,65 @@
+# Barracuda organization Semgrep rules for Nexus repositories.
+#
+# Consuming repositories add these to their `.guardrails/semgrep-rules.yml`
+# (custom-static-analysis capability, Tier 1 in the Barracuda tier model).
+# TypeScript rules are covered by fixtures in tests/barracuda-fixtures/.
+# C# rules must be validated against representative service code before a
+# repository makes them blocking (see policies/security.md).
+
+rules:
+  - id: barracuda.typescript-disabled-tls-verification
+    languages: [ts, js]
+    severity: ERROR
+    message: >
+      TLS certificate validation is disabled (rejectUnauthorized: false or
+      NODE_TLS_REJECT_UNAUTHORIZED=0). This enables man-in-the-middle
+      attacks. Trust the CA properly instead.
+    metadata:
+      tier: mechanical
+      policy: policies/barracuda-platform.md
+    pattern-either:
+      - pattern: |
+          { rejectUnauthorized: false }
+      - pattern: process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0"
+
+  - id: barracuda.typescript-direct-mui-import
+    languages: [ts, js]
+    severity: WARNING
+    message: >
+      Import from '@barracuda-internal/bds-core' instead of '@mui/material'.
+      Direct MUI imports bypass the Barracuda Design System.
+    metadata:
+      tier: mechanical
+      policy: policies/barracuda-platform.md
+    pattern-either:
+      - pattern: import $X from "@mui/material"
+      - pattern: import { $$$IMPORTS } from "@mui/material"
+
+  - id: barracuda.csharp-disabled-tls-verification
+    languages: [csharp]
+    severity: ERROR
+    message: >
+      TLS certificate validation is disabled. This enables man-in-the-middle
+      attacks. Add the CA to the trust store instead.
+    metadata:
+      tier: mechanical
+      policy: policies/barracuda-platform.md
+      validation: pending-representative-code
+    pattern: |
+      $HANDLER.ServerCertificateCustomValidationCallback = (...) => true;
+
+  - id: barracuda.csharp-sql-string-construction
+    languages: [csharp]
+    severity: ERROR
+    message: >
+      SQL constructed from an interpolated string. Use parameterized queries
+      or EF Core LINQ instead.
+    metadata:
+      tier: mechanical
+      policy: policies/barracuda-platform.md
+      validation: pending-representative-code
+    pattern-either:
+      - pattern: new SqlCommand($"...", ...)
+      - pattern: new NpgsqlCommand($"...", ...)
+      - pattern: $DB.Database.ExecuteSqlRaw($"...")
+      - pattern: $DB.FromSqlRaw($"...")
