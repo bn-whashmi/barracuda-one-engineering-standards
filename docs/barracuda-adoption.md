@@ -53,6 +53,10 @@ already runs into the evidence layer, plus adding the checks no repo has.
 
 4. Copy and **edit** the templates: `templates/AGENTS.md`,
    `templates/CLAUDE.md`. An unedited template misleads AI reviewers.
+   PR template: repos keep their existing `.github/PULL_REQUEST_TEMPLATE.md`
+   but must include the Barracuda checklist from
+   [templates/PULL_REQUEST_TEMPLATE.md](../templates/PULL_REQUEST_TEMPLATE.md)
+   (the master copy); new services get it via `nexus-service-template`.
 
 5. Branch protection: baseline rules (PR required, no force push, no
    deletion) are owned by the **organization-level ruleset** — verify
